@@ -11,7 +11,7 @@ load_dotenv()
 api_key = os.getenv('Mistral_New')
 client = Mistral(api_key=api_key)
 
-file_path = "Hexaware.pdf"
+file_path = "Hexaware-1-3.pdf"
 
 uploaded_file = client.files.upload(
     file={
@@ -74,30 +74,61 @@ def split_text(text, chunk_size=512, overlap=128):
         i += chunk_size - overlap
     return chunks
 
-def classify_with_groq(text_chunk):
+def classify_with_gemma(text_chunk):
     client = OpenAI(base_url="http://localhost:1247/v1",
                 api_key="lm-studio")
     
     system_prompt = (
         "Classify the following text into one of the following categories: "
-        "NA (Useless information like disclaimer), Financial Data, Company Information , Future Insight. "
+        "NA (Useless information like disclaimer), Financial Data, Company Information, Future Insight. "
         "Also provide a short summary of the text. "
         "Respond in JSON with keys: text, classification, summary."
     )
+    
+    # Fixed schema structure
+    character_schema = {
+        "type": "json_schema",
+        "json_schema": {
+            "name": "text_classification",  # Added name field
+            "schema": {  # Added schema wrapper
+                "type": "object",
+                "properties": {
+                    "text": {"type": "string"},
+                    "classification": {"type": "string"},
+                    "summary": {"type": "string"}
+                },
+                "required": ["text", "classification", "summary"]
+            }
+        }
+    }
+
     completion = client.chat.completions.create(
-    model="gemma-3-4b",
-    messages=[
-        {"role": "system", "content": system_prompt},
-        {"role": "user", "content": text_chunk}
-    ],
-    temperature=0.7,
+        model="gemma-3-4b",
+        messages=[
+            {"role": "system", "content": system_prompt},
+            {"role": "user", "content": text_chunk}
+        ],
+        temperature=0.2,
+        response_format=character_schema
     )
+    try:
+        response_content = completion.choices[0].message.content
+        parsed_response = json.loads(response_content)
+        return parsed_response
+    except json.JSONDecodeError as e:
+        return {
+            "text": text_chunk,
+            "classification": "ERROR",
+            "summary": f"JSON parsing error: {str(e)}"
+        }
+    except Exception as e:
+        return {
+            "text": text_chunk,
+            "classification": "ERROR", 
+            "summary": f"Error: {str(e)}"
+        }
 
-    response = completion.choices[0].message
-    print(f"Response: {response}")
-    return response
-
-def process_ocr_pages_with_groq(json_string):
+def process_ocr_pages_with_gemma(json_string):
     ocr_json = json.loads(json_string)
     results = []
     for page in ocr_json['pages']:
@@ -107,7 +138,8 @@ def process_ocr_pages_with_groq(json_string):
         classified_chunks = []
         for chunk in text_chunks:
             try:
-                llm_response = classify_with_groq(chunk)
+                llm_response = classify_with_gemma(chunk)
+                print(llm_response)
                 # LLM expected to return a JSON string
                 classified_chunks.append(json.loads(llm_response))
             except Exception as e:
@@ -123,6 +155,6 @@ def process_ocr_pages_with_groq(json_string):
     return results
 
 # --- Example usage ---
-result = process_ocr_pages_with_groq(json_string)
+result = process_ocr_pages_with_gemma(json_string)
 print(json.dumps(result, indent=2))
 
