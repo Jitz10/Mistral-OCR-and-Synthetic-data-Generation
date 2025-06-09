@@ -2777,3 +2777,196 @@ AttributeError: 'AlphaSageMicroAgents' object has no attribute '_get_ticker_for_
 2025-06-09 13:54:53,603 - WARNING - Gemini API rate limit exceeded: 429 Quota exceeded for quota metric 'Generate Content API requests per minute' and limit 'GenerateCo...
 2025-06-09 13:54:53,604 - INFO - Comprehensive analysis completed in 2.83 seconds
 2025-06-09 13:54:53,605 - INFO - Demo analysis completed successfully for Ganesha Ecosphere Limited
+2025-06-09 14:29:31,515 - INFO - MongoDB connection established
+2025-06-09 14:29:31,527 - INFO - Redis connection established
+2025-06-09 14:29:31,878 - INFO - ChromaDB connection established
+2025-06-09 14:42:17,374 - INFO - MongoDB connection established
+2025-06-09 14:42:17,382 - INFO - Redis connection established
+2025-06-09 14:42:17,607 - INFO - ChromaDB connection established
+2025-06-09 14:45:07,084 - INFO - MongoDB connection established
+2025-06-09 14:45:07,088 - INFO - Redis connection established
+2025-06-09 14:45:07,239 - INFO - ChromaDB connection established
+2025-06-09 14:45:54,703 - INFO - MongoDB connection established
+2025-06-09 14:45:54,708 - INFO - Redis connection established
+2025-06-09 14:45:54,952 - INFO - ChromaDB connection established
+2025-06-09 14:52:14,973 - INFO - MongoDB connection established
+2025-06-09 14:52:14,978 - INFO - Redis connection established
+2025-06-09 14:52:15,227 - INFO - ChromaDB connection established
+2025-06-09 14:52:15,272 - INFO - MongoDB connection established
+2025-06-09 14:52:15,274 - INFO - Redis connection established
+2025-06-09 14:52:15,275 - INFO - Anonymized telemetry enabled. See                     https://docs.trychroma.com/telemetry for more information.
+2025-06-09 14:52:15,501 - INFO - ChromaDB connection established
+2025-06-09 14:52:15,507 - INFO - Redis connection established for macro agents
+2025-06-09 14:52:15,529 - INFO - MongoDB connection established for macro agents
+2025-06-09 14:52:15,532 - INFO - Redis connection established for micro agents
+2025-06-09 14:52:15,590 - INFO - MongoDB connection established for micro agents
+2025-06-09 14:52:46,123 - INFO - MongoDB connection established
+2025-06-09 14:52:46,127 - INFO - Redis connection established
+2025-06-09 14:52:46,337 - INFO - ChromaDB connection established
+2025-06-09 14:52:46,377 - INFO - MongoDB connection established
+2025-06-09 14:52:46,378 - INFO - Redis connection established
+2025-06-09 14:52:46,379 - INFO - Anonymized telemetry enabled. See                     https://docs.trychroma.com/telemetry for more information.
+2025-06-09 14:52:46,554 - INFO - ChromaDB connection established
+2025-06-09 14:52:46,561 - INFO - Redis connection established for macro agents
+2025-06-09 14:52:46,621 - INFO - MongoDB connection established for macro agents
+2025-06-09 14:52:46,629 - INFO - Redis connection established for micro agents
+2025-06-09 14:52:46,673 - INFO - MongoDB connection established for micro agents
+2025-06-09 14:54:56,918 - INFO - MongoDB connection established
+2025-06-09 14:54:56,923 - INFO - Redis connection established
+2025-06-09 14:54:57,082 - INFO - ChromaDB connection established
+2025-06-09 14:54:57,100 - INFO - MongoDB connection established
+2025-06-09 14:54:57,101 - INFO - Redis connection established
+2025-06-09 14:54:57,101 - INFO - Anonymized telemetry enabled. See                     https://docs.trychroma.com/telemetry for more information.
+2025-06-09 14:54:57,215 - INFO - ChromaDB connection established
+2025-06-09 14:54:57,218 - INFO - Redis connection established for macro agents
+2025-06-09 14:54:57,250 - INFO - MongoDB connection established for macro agents
+2025-06-09 14:54:57,253 - INFO - Redis connection established for micro agents
+2025-06-09 14:54:57,288 - INFO - MongoDB connection established for micro agents
+2025-06-09 14:54:57,417 - INFO - Configured 10 micro agents
+2025-06-09 14:54:57,580 - INFO - AlphaSage Micro Agents initialized. System health: {'mongodb': True, 'redis': True, 'chromadb': True, 'gemini_api': True}
+2025-06-09 14:54:57,666 - INFO - Configured 8 macro agents
+2025-06-09 14:54:57,670 - INFO - AlphaSage Macro Agents initialized. System health: {'mongodb': True, 'redis': True, 'chromadb': True, 'gemini_api': True}
+2025-06-09 14:55:37,314 - INFO - MongoDB connection established
+2025-06-09 14:55:37,322 - INFO - Redis connection established
+2025-06-09 14:55:37,577 - INFO - ChromaDB connection established
+2025-06-09 14:55:37,613 - INFO - MongoDB connection established
+2025-06-09 14:55:37,614 - INFO - Redis connection established
+2025-06-09 14:55:37,615 - INFO - Anonymized telemetry enabled. See                     https://docs.trychroma.com/telemetry for more information.
+2025-06-09 14:55:37,800 - INFO - ChromaDB connection established
+2025-06-09 14:55:37,804 - INFO - Redis connection established for macro agents
+2025-06-09 14:55:37,823 - INFO - MongoDB connection established for macro agents
+2025-06-09 14:55:37,828 - INFO - Redis connection established for micro agents
+2025-06-09 14:55:37,848 - INFO - MongoDB connection established for micro agents
+2025-06-09 14:55:38,058 - INFO - Configured 10 micro agents
+2025-06-09 14:55:38,227 - INFO - AlphaSage Micro Agents initialized. System health: {'mongodb': True, 'redis': True, 'chromadb': True, 'gemini_api': True}
+2025-06-09 14:55:38,379 - INFO - Configured 8 macro agents
+2025-06-09 14:55:38,386 - INFO - AlphaSage Macro Agents initialized. System health: {'mongodb': True, 'redis': True, 'chromadb': True, 'gemini_api': True}
+2025-06-09 14:55:38,410 - INFO - Starting comprehensive analysis for Ganesha Ecosphere Limited
+2025-06-09 14:55:38,419 - ERROR - MicroAgent Error: YFinanceNumberTool.fetch_financial_data() got an unexpected keyword argument 'period', Context: {"ticker": "GANECOS.NS", "company_name": "Ganesha Ecosphere Limited", "years": 5}
+2025-06-09 14:55:38,420 - ERROR - Traceback (most recent call last):
+  File "C:\Users\Jiten\Desktop\Mistral-OCR-and-Synthetic-data-Generation\microagent.py", line 1190, in fetch_historical_data
+    price_data = await YFinanceNumberTool.fetch_financial_data(
+                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+TypeError: YFinanceNumberTool.fetch_financial_data() got an unexpected keyword argument 'period'
+
+2025-06-09 14:55:38,421 - ERROR - VectorSearchRAGTool error: name 'get_chromadb_connection' is not defined
+2025-06-09 14:55:38,424 - WARNING - Failed to get company name from ticker GANECOS.NS: name 'get_mongodb_connection' is not defined
+2025-06-09 14:55:39,230 - ERROR - VectorSearchRAGTool error: name 'get_chromadb_connection' is not defined
+2025-06-09 14:55:39,604 - ERROR - MicroAgent Error: YFinanceNumberTool.fetch_financial_data() got an unexpected keyword argument 'period', Context: {"ticker": "Ganesha Ecosphere Limited.NS", "company_name": "Ganesha Ecosphere Limited", "years": 10}
+2025-06-09 14:55:39,605 - ERROR - Traceback (most recent call last):
+  File "C:\Users\Jiten\Desktop\Mistral-OCR-and-Synthetic-data-Generation\microagent.py", line 1190, in fetch_historical_data
+    price_data = await YFinanceNumberTool.fetch_financial_data(
+                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+TypeError: YFinanceNumberTool.fetch_financial_data() got an unexpected keyword argument 'period'
+
+2025-06-09 14:55:39,612 - WARNING - Failed to get company name from ticker Ganesha Ecosphere Limited.NS: name 'get_mongodb_connection' is not defined
+2025-06-09 14:55:40,029 - WARNING - yfinance .info failed for Ganesha Ecosphere Limited.NS: HTTP Error 404: 
+2025-06-09 14:55:40,191 - WARNING - Failed to fetch debt to equity: 0
+2025-06-09 14:55:40,192 - WARNING - Failed to get company name from ticker Ganesha Ecosphere Limited.NS: name 'get_mongodb_connection' is not defined
+2025-06-09 14:55:41,691 - WARNING - yfinance .info failed for Ganesha Ecosphere Limited.NS: HTTP Error 404: 
+2025-06-09 14:55:41,697 - WARNING - Failed to fetch total debt: 0
+2025-06-09 14:55:41,699 - WARNING - Failed to get company name from ticker Ganesha Ecosphere Limited.NS: name 'get_mongodb_connection' is not defined
+2025-06-09 14:55:42,854 - WARNING - yfinance .info failed for Ganesha Ecosphere Limited.NS: HTTP Error 404: 
+2025-06-09 14:55:42,860 - WARNING - Failed to fetch total equity: 0
+2025-06-09 14:55:42,862 - INFO - Using cached financial data for Ganesha Ecosphere Limited.NS, metric: total debt
+2025-06-09 14:55:42,863 - WARNING - Failed to get company name from ticker Ganesha Ecosphere Limited.NS: name 'get_mongodb_connection' is not defined
+2025-06-09 14:55:43,373 - WARNING - yfinance .info failed for Ganesha Ecosphere Limited.NS: HTTP Error 404: 
+2025-06-09 14:55:43,379 - WARNING - Failed to get company name from ticker Ganesha Ecosphere Limited.NS: name 'get_mongodb_connection' is not defined
+2025-06-09 14:55:43,724 - WARNING - yfinance .info failed for Ganesha Ecosphere Limited.NS: HTTP Error 404: 
+2025-06-09 14:55:43,730 - WARNING - Leverage calculations failed: 0
+2025-06-09 14:55:43,731 - ERROR - VectorSearchRAGTool error: name 'get_chromadb_connection' is not defined
+2025-06-09 14:55:43,731 - ERROR - MicroAgent Error: ArithmeticCalculationTool.calculate_metrics() got an unexpected keyword argument 'inputs', Context: {"ticker": "Ganesha Ecosphere Limited.NS", "company_name": "Ganesha Ecosphere Limited"}
+2025-06-09 14:55:43,732 - ERROR - Traceback (most recent call last):
+  File "C:\Users\Jiten\Desktop\Mistral-OCR-and-Synthetic-data-Generation\microagent.py", line 1043, in calculate_leverage_ratios
+    dummy_leverage_calc = ArithmeticCalculationTool.calculate_metrics(
+                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+TypeError: ArithmeticCalculationTool.calculate_metrics() got an unexpected keyword argument 'inputs'
+
+2025-06-09 14:55:43,734 - ERROR - VectorSearchRAGTool error: name 'get_chromadb_connection' is not defined
+2025-06-09 14:55:43,737 - INFO - Using cached financial data for Ganesha Ecosphere Limited.NS, metric: debt to equity
+2025-06-09 14:55:43,744 - ERROR - MicroAgent Error: YFinanceNumberTool.fetch_financial_data() got an unexpected keyword argument 'period', Context: {"ticker": "GANECOS.NS", "company_name": "Ganesha Ecosphere Limited", "years": 5}
+2025-06-09 14:55:43,745 - ERROR - Traceback (most recent call last):
+  File "C:\Users\Jiten\Desktop\Mistral-OCR-and-Synthetic-data-Generation\microagent.py", line 1190, in fetch_historical_data
+    price_data = await YFinanceNumberTool.fetch_financial_data(
+                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+TypeError: YFinanceNumberTool.fetch_financial_data() got an unexpected keyword argument 'period'
+
+2025-06-09 14:55:43,746 - ERROR - MicroAgent Error: 'AlphaSageMicroAgents' object has no attribute '_get_ticker_for_company', Context: {"agent": "ScenarioAnalysisAgent", "company_name": "Ganesha Ecosphere Limited"}
+2025-06-09 14:55:43,750 - ERROR - Traceback (most recent call last):
+  File "C:\Users\Jiten\Desktop\Mistral-OCR-and-Synthetic-data-Generation\microagent.py", line 1549, in perform_scenario_analysis
+    ticker = self._get_ticker_for_company(company_name)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'AlphaSageMicroAgents' object has no attribute '_get_ticker_for_company'
+
+2025-06-09 14:55:43,753 - INFO - Using cached financial data for GANECOS.NS, metric: revenue
+2025-06-09 14:55:43,770 - WARNING - Gemini API rate limit exceeded: 429 Quota exceeded for quota metric 'Generate Content API requests per minute' and limit 'GenerateCo...
+2025-06-09 14:55:43,773 - ERROR - VectorSearchRAGTool error: name 'get_chromadb_connection' is not defined
+2025-06-09 14:55:43,775 - WARNING - Gemini API rate limit exceeded: 429 Quota exceeded for quota metric 'Generate Content API requests per minute' and limit 'GenerateCo...
+2025-06-09 14:55:43,776 - WARNING - Gemini API rate limit exceeded: 429 Quota exceeded for quota metric 'Generate Content API requests per minute' and limit 'GenerateCo...
+2025-06-09 14:55:43,777 - ERROR - VectorSearchRAGTool error: name 'get_chromadb_connection' is not defined
+2025-06-09 14:55:44,049 - WARNING - Gemini API rate limit exceeded: 429 Quota exceeded for quota metric 'Generate Content API requests per minute' and limit 'GenerateCo...
+2025-06-09 14:55:44,253 - ERROR - VectorSearchRAGTool error: name 'get_chromadb_connection' is not defined
+2025-06-09 14:55:45,289 - WARNING - Gemini API rate limit exceeded: 429 Quota exceeded for quota metric 'Generate Content API requests per minute' and limit 'GenerateCo...
+2025-06-09 14:55:45,295 - WARNING - Gemini API rate limit exceeded: 429 Quota exceeded for quota metric 'Generate Content API requests per minute' and limit 'GenerateCo...
+2025-06-09 14:55:45,297 - ERROR - VectorSearchRAGTool error: name 'get_chromadb_connection' is not defined
+2025-06-09 14:55:45,308 - WARNING - Gemini API rate limit exceeded: 429 Quota exceeded for quota metric 'Generate Content API requests per minute' and limit 'GenerateCo...
+2025-06-09 14:55:45,478 - ERROR - VectorSearchRAGTool error: name 'get_chromadb_connection' is not defined
+2025-06-09 14:55:45,480 - WARNING - Gemini API rate limit exceeded: 429 Quota exceeded for quota metric 'Generate Content API requests per minute' and limit 'GenerateCo...
+2025-06-09 14:55:45,581 - WARNING - Gemini API rate limit exceeded: 429 Quota exceeded for quota metric 'Generate Content API requests per minute' and limit 'GenerateCo...
+2025-06-09 14:55:46,820 - WARNING - Gemini API rate limit exceeded: 429 Quota exceeded for quota metric 'Generate Content API requests per minute' and limit 'GenerateCo...
+2025-06-09 14:55:46,821 - INFO - Comprehensive analysis completed in 8.41 seconds
+2025-06-09 14:55:46,822 - ERROR - Error generating PDF report: 'MacroAgentResult' object has no attribute 'get'
+2025-06-09 14:58:07,645 - INFO - MongoDB connection established
+2025-06-09 14:58:07,649 - INFO - Redis connection established
+2025-06-09 14:58:07,833 - INFO - ChromaDB connection established
+2025-06-09 14:58:07,849 - INFO - MongoDB connection established
+2025-06-09 14:58:07,850 - INFO - Redis connection established
+2025-06-09 14:58:07,850 - INFO - Anonymized telemetry enabled. See                     https://docs.trychroma.com/telemetry for more information.
+2025-06-09 14:58:07,978 - INFO - ChromaDB connection established
+2025-06-09 14:58:07,984 - INFO - Redis connection established for macro agents
+2025-06-09 14:58:08,003 - INFO - MongoDB connection established for macro agents
+2025-06-09 14:58:08,006 - INFO - Redis connection established for micro agents
+2025-06-09 14:58:08,052 - INFO - MongoDB connection established for micro agents
+2025-06-09 14:58:08,140 - INFO - Configured 10 micro agents
+2025-06-09 14:58:08,257 - INFO - AlphaSage Micro Agents initialized. System health: {'mongodb': True, 'redis': True, 'chromadb': True, 'gemini_api': True}
+2025-06-09 14:58:08,324 - INFO - Configured 8 macro agents
+2025-06-09 14:58:08,330 - INFO - AlphaSage Macro Agents initialized. System health: {'mongodb': True, 'redis': True, 'chromadb': True, 'gemini_api': True}
+2025-06-09 14:58:08,341 - INFO - Starting comprehensive analysis for Ganesha Ecosphere Limited
+2025-06-09 14:58:08,345 - INFO - Comprehensive analysis completed in 0.00 seconds
+2025-06-09 14:58:08,346 - ERROR - Error generating PDF report: 'MacroAgentResult' object has no attribute 'get'
+2025-06-09 15:01:36,861 - INFO - MongoDB connection established
+2025-06-09 15:01:36,873 - INFO - Redis connection established
+2025-06-09 15:01:37,162 - INFO - ChromaDB connection established
+2025-06-09 15:01:37,185 - INFO - MongoDB connection established
+2025-06-09 15:01:37,186 - INFO - Redis connection established
+2025-06-09 15:01:37,187 - INFO - Anonymized telemetry enabled. See                     https://docs.trychroma.com/telemetry for more information.
+2025-06-09 15:01:37,409 - INFO - ChromaDB connection established
+2025-06-09 15:01:37,413 - INFO - Redis connection established for macro agents
+2025-06-09 15:01:37,425 - INFO - MongoDB connection established for macro agents
+2025-06-09 15:01:37,428 - INFO - Redis connection established for micro agents
+2025-06-09 15:01:37,440 - INFO - MongoDB connection established for micro agents
+2025-06-09 15:01:37,546 - INFO - Configured 10 micro agents
+2025-06-09 15:01:37,656 - INFO - AlphaSage Micro Agents initialized. System health: {'mongodb': True, 'redis': True, 'chromadb': True, 'gemini_api': True}
+2025-06-09 15:01:37,739 - INFO - Configured 8 macro agents
+2025-06-09 15:01:37,746 - INFO - AlphaSage Macro Agents initialized. System health: {'mongodb': True, 'redis': True, 'chromadb': True, 'gemini_api': True}
+2025-06-09 15:01:37,758 - INFO - Starting comprehensive analysis for Ganesha Ecosphere Limited
+2025-06-09 15:01:37,763 - INFO - Comprehensive analysis completed in 0.01 seconds
+2025-06-09 15:01:39,256 - INFO - PDF report generated successfully: output\Ganesha_Ecosphere_Limited_report.pdf
+2025-06-09 15:06:17,763 - INFO - MongoDB connection established
+2025-06-09 15:06:17,769 - INFO - Redis connection established
+2025-06-09 15:06:17,959 - INFO - ChromaDB connection established
+2025-06-09 15:06:17,982 - INFO - MongoDB connection established
+2025-06-09 15:06:17,982 - INFO - Redis connection established
+2025-06-09 15:06:17,983 - INFO - Anonymized telemetry enabled. See                     https://docs.trychroma.com/telemetry for more information.
+2025-06-09 15:06:18,148 - INFO - ChromaDB connection established
+2025-06-09 15:06:18,156 - INFO - Redis connection established for macro agents
+2025-06-09 15:06:18,195 - INFO - MongoDB connection established for macro agents
+2025-06-09 15:06:18,197 - INFO - Redis connection established for micro agents
+2025-06-09 15:06:18,241 - INFO - MongoDB connection established for micro agents
+2025-06-09 15:06:18,333 - INFO - Configured 10 micro agents
+2025-06-09 15:06:18,491 - INFO - AlphaSage Micro Agents initialized. System health: {'mongodb': True, 'redis': True, 'chromadb': True, 'gemini_api': True}
+2025-06-09 15:06:18,585 - INFO - Configured 8 macro agents
+2025-06-09 15:06:18,590 - INFO - AlphaSage Macro Agents initialized. System health: {'mongodb': True, 'redis': True, 'chromadb': True, 'gemini_api': True}
+2025-06-09 15:06:18,604 - INFO - Starting comprehensive analysis for Ganesha Ecosphere Limited
+2025-06-09 15:06:18,610 - INFO - Comprehensive analysis completed in 0.01 seconds
+2025-06-09 15:06:19,708 - INFO - PDF report generated successfully: output\Ganesha_Ecosphere_Limited_report.pdf
