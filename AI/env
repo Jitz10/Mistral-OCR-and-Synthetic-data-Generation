@@ -1,0 +1,16 @@
+# API Keys
+Mistral_New=FMdJG5EQciSCM3qsJbPGn4VGAFa5aNri
+GEMINI_API_KEY=AIzaSyDk2kkor-FIvfUJqYq1O-DEjL33deLfQK0
+SERPAPI_API_KEY=89a9b4d9b3345699068ab91c349ad2022604d71c99caa317867c85e8d62f10d8
+
+# Database connections
+MONGODB_URI=mongodb://localhost:27017/
+REDIS_URL=redis://localhost:6379
+
+# LLM configuration 
+# Add any additional LLM configuration keys here
+
+# Additional settings
+CHROMADB_PATH=./chromadb_data
+COLLECTION_NAME=alphasage_chunks
+LOG_LEVEL=INFO
