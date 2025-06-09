@@ -11,7 +11,7 @@ load_dotenv()
 api_key = os.getenv('Mistral_New')
 client = Mistral(api_key=api_key)
 
-file_path = "Hexaware-1-3.pdf"
+file_path = "D:\Mistral-OCR-and-Synthetic-data-Generation\Assets\Hexaware-1-3.pdf"
 
 uploaded_file = client.files.upload(
     file={
