@@ -1,0 +1,143 @@
+{
+  "company_name": "Reliance Industries Ltd.",
+  "about_company": {
+    "description": "Reliance Industries Limited engages in hydrocarbon exploration and production, oil and chemicals, textile, retail, digital, material and composites, renewables, and financial services businesses worldwide. It operates through Oil to Chemicals, Oil and Gas, Retail, Digital Services, and Others segments. The company produces and markets petroleum products, such as liquefied petroleum gas, propylene, naphtha, gasoline, jet/aviation turbine fuel, kerosene oil, diesel, sulphur, and petroleum coke. It also provides petrochemicals, including high-density and low-density polyethylene (PE), linear low-density PE, polyester fibers and yarns, polypropylene, polyvinyl chloride, purified terephthalic acid, ethylene glycols and oxide, paraxylene, ortho xylene, benzene, linear alkyl benzene and paraffin, poly butadiene rubber, styrene butadiene rubber, butyl rubber, and polyethylene terephthalate. In addition, the company manufactures and markets yarns, fabrics, apparel, and auto furnishings; explores, develops, and produces crude oil and natural gas; and operates various stores comprising neighborhood, supermarket, hypermarket, wholesale cash and carry, specialty, online stores, as well as stores that offer apparel, beauty and cosmetics, accessories, footwear, consumer electronics, connectivity products, and others. Further, the company provides range of digital television, gaming, broadband, and telecommunication services under the Jio brand name; and non-banking financial and insurance broking services. Additionally, it operates news and entertainment platforms, and Network18 and television channels; publishes magazines; and offers highway hospitality and fleet management services. The company was founded in 1957 and is based in Mumbai, India. The company has a market cap of 19605886074880 and N/A employees."
+  },
+  "about_sector": {
+    "description": "The company operates in the Energy sector, specifically in Oil & Gas Refining & Marketing."
+  },
+  "key_ratios": {
+    "enterprise_value": 22715194933248,
+    "revenue_growth_yoy": 0.105,
+    "ebitda_margin": 0.1715,
+    "net_profit_margin": 0.0722,
+    "return_on_equity": 0.08402,
+    "debt_to_equity_ratio": 36.605,
+    "current_ratio": 1.1,
+    "quick_ratio": 0.589
+  },
+  "price_and_volume_chart": {
+    "description": "Latest price: 1448.800048828125, Volume: 7885125.0"
+  },
+  "profit_and_loss_statement": {
+    "periods": [
+      {
+        "period": "Mar-24",
+        "sales": 9010640000000.0,
+        "operating_profit": 1116660000000.0,
+        "net_profit": 696210000000.0
+      },
+      {
+        "period": "Mar-23",
+        "sales": 8778350000000.0,
+        "operating_profit": 1020150000000.0,
+        "net_profit": 667020000000.0
+      },
+      {
+        "period": "Mar-22",
+        "sales": 6959630000000.0,
+        "operating_profit": 787630000000.0,
+        "net_profit": 607050000000.0
+      },
+      {
+        "period": "Mar-21",
+        "sales": 4669240000000.0,
+        "operating_profit": 541650000000.0,
+        "net_profit": 491280000000.0
+      }
+    ]
+  },
+  "balance_sheet": {
+    "periods": [
+      {
+        "period": "Mar-24",
+        "total_assets": 17559860000000.0,
+        "total_liabilities": null,
+        "equity": null
+      },
+      {
+        "period": "Mar-23",
+        "total_assets": 16074310000000.0,
+        "total_liabilities": null,
+        "equity": null
+      },
+      {
+        "period": "Mar-22",
+        "total_assets": 14996650000000.0,
+        "total_liabilities": null,
+        "equity": null
+      },
+      {
+        "period": "Mar-21",
+        "total_assets": 13212120000000.0,
+        "total_liabilities": null,
+        "equity": null
+      }
+    ]
+  },
+  "cashflow_statement": {
+    "periods": [
+      {
+        "period": "Mar-24",
+        "cash_from_operating_activity": 1587880000000.0,
+        "cash_from_investing_activity": -1143010000000.0,
+        "cash_from_financing_activity": -166460000000.0
+      },
+      {
+        "period": "Mar-23",
+        "cash_from_operating_activity": 1150320000000.0,
+        "cash_from_investing_activity": -912350000000.0,
+        "cash_from_financing_activity": 104550000000.0
+      },
+      {
+        "period": "Mar-22",
+        "cash_from_operating_activity": 1106540000000.0,
+        "cash_from_investing_activity": -1101030000000.0,
+        "cash_from_financing_activity": 172890000000.0
+      },
+      {
+        "period": "Mar-21",
+        "cash_from_operating_activity": 269580000000.0,
+        "cash_from_investing_activity": -1424090000000.0,
+        "cash_from_financing_activity": 1019040000000.0
+      }
+    ]
+  },
+  "predictions": {
+    "profit_and_loss_statement": {
+      "period": "Mar-25",
+      "description": "Projected financial performance based on historical trends and market conditions.",
+      "data": {
+        "sales": 0.1155,
+        "operating_profit": 0.127732,
+        "net_profit": 0.07942
+      }
+    }
+  },
+  "shareholders_information": {
+    "shareholding_pattern": [
+      {
+        "period": "Jun-25",
+        "promoter": 0.49662998,
+        "institutional": 0.27813,
+        "public": 0.27813
+      }
+    ]
+  },
+  "competition": {
+    "segments": [
+      {
+        "segment": "Oil & Gas Refining & Marketing",
+        "market_size": "N/A",
+        "beneficiaries": [
+          "Competitor 1",
+          "Competitor 2",
+          "Competitor 3"
+        ]
+      }
+    ]
+  },
+  "concall_presentation_summary": {
+    "description": "Latest analyst recommendations: {'period': {0: '0m', 1: '-1m', 2: '-2m', 3: '-3m'}, 'strongBuy': {0: 12, 1: 12, 2: 12, 3: 12}, 'buy': {0: 20, 1: 20, 2: 21, 3: 21}, 'hold': {0: 1, 1: 1, 2: 0, 3: 0}, 'sell': {0: 1, 1: 1, 2: 1, 3: 1}, 'strongSell': {0: 1, 1: 1, 2: 1, 3: 1}}"
+  }
+}

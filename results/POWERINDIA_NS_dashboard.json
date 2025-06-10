@@ -1,0 +1,161 @@
+{
+  "company_name": "Hitachi Energy India Ltd.",
+  "about_company": {
+    "description": "Hitachi Energy India Limited offers products, projects, and services for electricity transmission and related activities in India and internationally. The company is involved in engineering, integration, installation, commissioning, and support of project and services; and design, manufacturing, configuration, and supply of system, equipment, devices, and accessories products. It also manufactures and sells electric motors, generators, transformers, and electricity distribution and control apparatus, as well as related electrical equipment. The company was formerly known as ABB Power Products and Systems India Limited and changed its name to Hitachi Energy India Limited in November 2021. Hitachi Energy India Limited was incorporated in 2019 and is headquartered in Bengaluru, India. Hitachi Energy India Limited is a subsidiary of Hitachi Energy Ltd. The company has a market cap of 808587886592 and N/A employees."
+  },
+  "about_sector": {
+    "description": "The company operates in the Industrials sector, specifically in Electrical Equipment & Parts."
+  },
+  "key_ratios": {
+    "enterprise_value": 735921897472,
+    "revenue_growth_yoy": 0.134,
+    "ebitda_margin": 0.09332,
+    "net_profit_margin": 0.06014,
+    "return_on_equity": 0.13778,
+    "debt_to_equity_ratio": 2.099,
+    "current_ratio": 1.755,
+    "quick_ratio": 1.37
+  },
+  "price_and_volume_chart": {
+    "description": "Latest price: 18141.0, Volume: 140612.0"
+  },
+  "profit_and_loss_statement": {
+    "periods": [
+      {
+        "period": "Mar-25",
+        "sales": 62240900000.0,
+        "operating_profit": 5044600000.0,
+        "net_profit": 3839800000.0
+      },
+      {
+        "period": "Mar-24",
+        "sales": 50960400000.0,
+        "operating_profit": 2589600000.0,
+        "net_profit": 1637800000.0
+      },
+      {
+        "period": "Mar-23",
+        "sales": 43345000000.0,
+        "operating_profit": 2119300000.0,
+        "net_profit": 939000000.0
+      },
+      {
+        "period": "Dec-21",
+        "sales": 47606700000.0,
+        "operating_profit": 2695000000.0,
+        "net_profit": 2034000000.0
+      },
+      {
+        "period": "Dec-20",
+        "sales": NaN,
+        "operating_profit": NaN,
+        "net_profit": NaN
+      }
+    ]
+  },
+  "balance_sheet": {
+    "periods": [
+      {
+        "period": "Mar-25",
+        "total_assets": 86133200000.0,
+        "total_liabilities": null,
+        "equity": null
+      },
+      {
+        "period": "Mar-24",
+        "total_assets": 47073700000.0,
+        "total_liabilities": null,
+        "equity": null
+      },
+      {
+        "period": "Mar-23",
+        "total_assets": 39185100000.0,
+        "total_liabilities": null,
+        "equity": null
+      },
+      {
+        "period": "Dec-21",
+        "total_assets": 35238800000.0,
+        "total_liabilities": null,
+        "equity": null
+      },
+      {
+        "period": "Dec-20",
+        "total_assets": NaN,
+        "total_liabilities": null,
+        "equity": null
+      }
+    ]
+  },
+  "cashflow_statement": {
+    "periods": [
+      {
+        "period": "Mar-25",
+        "cash_from_operating_activity": 14937700000.0,
+        "cash_from_investing_activity": -1099900000.0,
+        "cash_from_financing_activity": 22947300000.0
+      },
+      {
+        "period": "Mar-24",
+        "cash_from_operating_activity": 2523100000.0,
+        "cash_from_investing_activity": -887200000.0,
+        "cash_from_financing_activity": -1987400000.0
+      },
+      {
+        "period": "Mar-23",
+        "cash_from_operating_activity": 53700000.0,
+        "cash_from_investing_activity": -117700000.0,
+        "cash_from_financing_activity": 836900000.0
+      },
+      {
+        "period": "Dec-21",
+        "cash_from_operating_activity": -1266900000.0,
+        "cash_from_investing_activity": -1669500000.0,
+        "cash_from_financing_activity": 605900000.0
+      },
+      {
+        "period": "Dec-20",
+        "cash_from_operating_activity": NaN,
+        "cash_from_investing_activity": NaN,
+        "cash_from_financing_activity": NaN
+      }
+    ]
+  },
+  "predictions": {
+    "profit_and_loss_statement": {
+      "period": "Mar-25",
+      "description": "Projected financial performance based on historical trends and market conditions.",
+      "data": {
+        "sales": 0.14740000000000003,
+        "operating_profit": 0.14461701100000002,
+        "net_profit": 0.066154
+      }
+    }
+  },
+  "shareholders_information": {
+    "shareholding_pattern": [
+      {
+        "period": "Jun-25",
+        "promoter": 0.71549004,
+        "institutional": 0.10253,
+        "public": 0.10253
+      }
+    ]
+  },
+  "competition": {
+    "segments": [
+      {
+        "segment": "Electrical Equipment & Parts",
+        "market_size": "N/A",
+        "beneficiaries": [
+          "Competitor 1",
+          "Competitor 2",
+          "Competitor 3"
+        ]
+      }
+    ]
+  },
+  "concall_presentation_summary": {
+    "description": "Latest analyst recommendations: {'period': {0: '0m', 1: '-1m', 2: '-2m'}, 'strongBuy': {0: 2, 1: 2, 2: 2}, 'buy': {0: 6, 1: 5, 2: 4}, 'hold': {0: 0, 1: 0, 2: 0}, 'sell': {0: 1, 1: 1, 2: 1}, 'strongSell': {0: 1, 1: 1, 2: 1}}"
+  }
+}

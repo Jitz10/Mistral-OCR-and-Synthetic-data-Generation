@@ -8,6 +8,8 @@ from typing import Dict, List, Any, Optional, Union, Callable
 from datetime import datetime, timedelta
 from dataclasses import dataclass
 import hashlib
+import yfinance as yf
+import chromadb
 
 # AutoGen imports
 try:
@@ -22,10 +24,9 @@ except ImportError as e:
 try:
     import redis
     from pymongo import MongoClient
-    import chromadb
 except ImportError as e:
     print("ERROR: Missing database libraries. Please install with:")
-    print("pip install redis pymongo chromadb")
+    print("pip install redis pymongo")
     raise e
 
 try:
@@ -38,14 +39,15 @@ except ImportError as e:
 # Import our custom tools and micro agents
 try:
     from tools import (
-        ReasoningTool, YFinanceNumberTool, YFinanceNewsTool, 
-        ArithmeticCalculationTool, VectorSearchRAGTool,
+        ReasoningTool, YFinanceAgentTool, YFinanceNewsTool, 
+        ArithmeticCalculationTool, VectorSearchTool,
         check_system_health, cache_result, get_cached_result, generate_cache_key
     )
     from microagent import AlphaSageMicroAgents, AgentResult
 except ImportError as e:
     print("ERROR: Could not import tools.py or microagent.py. Make sure they're in the same directory.")
-    raise e
+    # Don't raise - let it continue with warnings
+    print(f"Import warning: {e}")
 
 # Load environment variables
 load_dotenv()
@@ -74,32 +76,235 @@ class MacroAgentResult:
     error: Optional[str] = None
     cache_key: Optional[str] = None
 
+class AgentResult:
+    """Result from an agent's analysis."""
+    
+    def __init__(
+        self,
+        agent_name: str = None,
+        data: Dict = None,
+        sources: List[str] = None,
+        execution_time: float = 0.0,
+        success: bool = True,
+        error: str = None,
+        cache_key: str = None,
+        metadata: Dict = None
+    ):
+        self.agent_name = agent_name
+        self.data = data or {}
+        self.sources = sources or []
+        self.execution_time = execution_time
+        self.success = success
+        self.error = error
+        self.cache_key = cache_key
+        self.metadata = metadata or {}
+    
+    def to_dict(self) -> Dict:
+        """Convert result to dictionary."""
+        return {
+            "agent_name": self.agent_name,
+            "data": self.data,
+            "sources": self.sources,
+            "execution_time": self.execution_time,
+            "success": self.success,
+            "error": self.error,
+            "cache_key": self.cache_key,
+            "metadata": self.metadata
+        }
+    
+    @classmethod
+    def from_dict(cls, data: Dict) -> 'AgentResult':
+        """Create result from dictionary."""
+        return cls(
+            agent_name=data.get("agent_name"),
+            data=data.get("data", {}),
+            sources=data.get("sources", []),
+            execution_time=data.get("execution_time", 0.0),
+            success=data.get("success", True),
+            error=data.get("error"),
+            cache_key=data.get("cache_key"),
+            metadata=data.get("metadata", {})
+        )
+
+class MacroAgent:
+    """Macro-level analysis agent for comprehensive company analysis."""
+    
+    def __init__(self, name: str, llm_config: Dict):
+        """Initialize the macro agent."""
+        self.name = name
+        self.llm_config = llm_config
+        self.mongo_client = None
+        self.redis_client = None
+        self.chroma_client = None
+        self.gemini_api = None
+        self.analysis_tools = None
+        self.reasoning_tool = None
+        
+    async def execute(self, company_name: str) -> AgentResult:
+        """Execute the macro analysis."""
+        try:
+            start_time = time.time()
+            
+            # Generate cache key
+            cache_key = generate_cache_key(self.name, company_name)
+            
+            # Check cache
+            cached_result = get_cached_result(cache_key)
+            if cached_result:
+                return cached_result
+            
+            # Perform analysis
+            analysis_result = await self._perform_analysis(company_name)
+            
+            # Create result
+            result = AgentResult(
+                agent_name=self.name,
+                data=analysis_result,
+                sources=[],
+                execution_time=time.time() - start_time,
+                success=True,
+                cache_key=cache_key
+            )
+            
+            # Cache result
+            cache_result(cache_key, result)
+            
+            return result
+            
+        except Exception as e:
+            logger.error(f"Error in macro agent execution: {str(e)}")
+            return AgentResult(
+                agent_name=self.name,
+                data={},
+                sources=[],
+                execution_time=time.time() - start_time,
+                success=False,
+                error=str(e)
+            )
+            
+    async def _perform_analysis(self, company_name: str) -> Dict:
+        """Perform the actual analysis."""
+        try:
+            # Initialize tools if not already done
+            if not self.analysis_tools:
+                self.analysis_tools = AnalysisTools(
+                    mongo_client=self.mongo_client,
+                    redis_client=self.redis_client,
+                    chroma_client=self.chroma_client
+                )
+            
+            if not self.reasoning_tool:
+                self.reasoning_tool = ReasoningTool(
+                    gemini_api=self.gemini_api,
+                    llm_config=self.llm_config
+                )
+            
+            # Get company data
+            company_data = await self.analysis_tools.get_company_data(company_name)
+            
+            # Perform analysis based on agent type
+            if self.name == "business_analysis":
+                return await self._analyze_business(company_data)
+            elif self.name == "financial_analysis":
+                return await self._analyze_financial(company_data)
+            elif self.name == "market_analysis":
+                return await self._analyze_market(company_data)
+            elif self.name == "risk_analysis":
+                return await self._analyze_risk(company_data)
+            else:
+                raise ValueError(f"Unknown agent type: {self.name}")
+                
+        except Exception as e:
+            logger.error(f"Error in analysis: {str(e)}")
+            raise
+
 class AlphaSageMacroAgents:
-    """
-    AlphaSage Macro Agents for high-level financial analysis
-    Orchestrates Micro Agents and tools for comprehensive company analysis
-    """
+    """Enhanced macro-level analysis agents for comprehensive company analysis"""
     
     def __init__(self):
-        """Initialize the macro agents system"""
-        
-        # Initialize connections
-        self.redis_client = self._init_redis()
-        self.mongo_client = self._init_mongodb()
-        
-        # Initialize micro agents system
-        self.micro_agents = AlphaSageMicroAgents()
-        
-        # AutoGen configuration
-        self.llm_config = self._load_llm_config()
-        
-        # Initialize all macro agents
-        self.agents = {}
-        self._configure_macro_agents()
-        
-        # System health check
-        self.system_health = check_system_health()
-        logger.info(f"AlphaSage Macro Agents initialized. System health: {self.system_health}")
+        """Initialize macro agents with enhanced error handling"""
+        try:
+            # Initialize micro agents first
+            from microagent import AlphaSageMicroAgents
+            self.micro_agents = AlphaSageMicroAgents()
+            
+            # Initialize connections
+            self.redis_client = self._init_redis()
+            self.mongo_client = self._init_mongodb()
+            self.chroma_client = self._init_chromadb()
+            
+            # Load LLM configuration
+            self.llm_config = self._load_llm_config()
+            
+            # Initialize agents
+            self.agents = {}
+            self._configure_macro_agents()
+            
+            # Initialize tools
+            self.tools = {
+                'yfinance': YFinanceAgentTool(),
+                'news': YFinanceNewsTool(),
+                'arithmetic': ArithmeticCalculationTool(),
+                'rag': VectorSearchTool(),
+                'reasoning': ReasoningTool()
+            }
+            
+            logger.info("Macro agents initialized successfully")
+            
+        except Exception as e:
+            logger.error(f"Error initializing macro agents: {str(e)}")
+            raise
+    
+    def _configure_macro_agents(self):
+        """Configure all macro agents with proper error handling"""
+        try:
+            # Initialize business analysis agent
+            self.agents['business'] = MacroAgent(
+                name="BusinessAnalysisAgent",
+                llm_config=self.llm_config
+            )
+            
+            # Initialize sector analysis agent
+            self.agents['sector'] = MacroAgent(
+                name="SectorAnalysisAgent",
+                llm_config=self.llm_config
+            )
+            
+            # Initialize deep dive agent
+            self.agents['deepdive'] = MacroAgent(
+                name="DeepDiveAgent",
+                llm_config=self.llm_config
+            )
+            
+            # Initialize current affairs agent
+            self.agents['current_affairs'] = MacroAgent(
+                name="CurrentAffairsAgent",
+                llm_config=self.llm_config
+            )
+            
+            # Initialize predictions agent
+            self.agents['predictions'] = MacroAgent(
+                name="PredictionsAgent",
+                llm_config=self.llm_config
+            )
+            
+            # Initialize concall analysis agent
+            self.agents['concall'] = MacroAgent(
+                name="ConcallAnalysisAgent",
+                llm_config=self.llm_config
+            )
+            
+            # Initialize risk analysis agent
+            self.agents['risks'] = MacroAgent(
+                name="RiskAnalysisAgent",
+                llm_config=self.llm_config
+            )
+            
+            logger.info("All macro agents configured successfully")
+            
+        except Exception as e:
+            logger.error(f"Error configuring macro agents: {str(e)}")
+            raise
 
     def _init_redis(self) -> Optional[redis.Redis]:
         """Initialize Redis connection for caching"""
@@ -125,6 +330,16 @@ class AlphaSageMacroAgents:
             logger.warning(f"MongoDB connection failed: {e}")
             return None
 
+    def _init_chromadb(self) -> Optional[chromadb.Client]:
+        """Initialize ChromaDB connection"""
+        try:
+            client = chromadb.Client()
+            logger.info("ChromaDB connection established for macro agents")
+            return client
+        except Exception as e:
+            logger.warning(f"ChromaDB connection failed: {e}")
+            return None
+
     def _load_llm_config(self) -> Dict[str, Any]:
         """Load LLM configuration"""
         try:
@@ -142,179 +357,70 @@ class AlphaSageMacroAgents:
             self.log_macro_error(e, {"context": "Loading LLM config"})
             return None
 
-    def _configure_macro_agents(self):
-        """Configure all macro agents with their specific capabilities"""
-        
-        # Base system message for all macro agents
-        base_system_msg = """You are a senior financial analyst specializing in Indian equities. 
-You orchestrate multiple specialized agents to provide comprehensive company analysis.
-Always provide structured JSON outputs with complete source attribution and executive summaries.
-Focus on actionable insights and clear reasoning."""
-
-        # Configure BusinessResearchAgent
-        self.agents['business'] = ConversableAgent(
-            name="BusinessResearchAgent",
-            system_message=base_system_msg + """
-Specialization: Analyze business models, products, services, and competitive positioning.
-Coordinate with Historical and Guidance agents to understand business evolution and strategy.
-Provide comprehensive business intelligence with growth drivers and market positioning.""",
-            llm_config=self.llm_config,
-            human_input_mode="NEVER",
-            max_consecutive_auto_reply=1
-        )
-
-        # Configure SectorResearchAgent
-        self.agents['sector'] = ConversableAgent(
-            name="SectorResearchAgent",
-            system_message=base_system_msg + """
-Specialization: Evaluate sector trends, regulatory changes, and competitive dynamics.
-Coordinate with News and Sentiment agents to understand market sentiment and industry developments.
-Focus on macro trends affecting the entire sector.""",
-            llm_config=self.llm_config,
-            human_input_mode="NEVER",
-            max_consecutive_auto_reply=1
-        )
-
-        # Configure CompanyDeepDiveAgent
-        self.agents['deepdive'] = ConversableAgent(
-            name="CompanyDeepDiveAgent",
-            system_message=base_system_msg + """
-Specialization: Comprehensive company analysis including history, management, governance, and culture.
-Coordinate with Historical and Sentiment agents for complete company profile.
-Provide detailed company intelligence for investment decisions.""",
-            llm_config=self.llm_config,
-            human_input_mode="NEVER",
-            max_consecutive_auto_reply=1
-        )
-
-        # Configure DebtAndWorkingCapitalAgent
-        self.agents['debt_wc'] = ConversableAgent(
-            name="DebtAndWorkingCapitalAgent",
-            system_message=base_system_msg + """
-Specialization: Analyze debt structure, working capital management, and financial health.
-Coordinate with Leverage and Liquidity agents for comprehensive financial risk assessment.
-Focus on debt sustainability and cash flow management.""",
-            llm_config=self.llm_config,
-            human_input_mode="NEVER",
-            max_consecutive_auto_reply=1
-        )
-
-        # Configure CurrentAffairsAgent
-        self.agents['current_affairs'] = ConversableAgent(
-            name="CurrentAffairsAgent",
-            system_message=base_system_msg + """
-Specialization: Monitor and analyze recent developments, news, and market events.
-Coordinate with News and Sentiment agents to provide timely market intelligence.
-Focus on events that could impact short-term performance and investor sentiment.""",
-            llm_config=self.llm_config,
-            human_input_mode="NEVER",
-            max_consecutive_auto_reply=1
-        )
-
-        # Configure FuturePredictionsAgent
-        self.agents['predictions'] = ConversableAgent(
-            name="FuturePredictionsAgent",
-            system_message=base_system_msg + """
-Specialization: Generate evidence-based financial projections and scenario analysis.
-Coordinate with Guidance, Scenario, and Historical agents for comprehensive forecasting.
-Provide probabilistic forecasts with clear assumptions and risk factors.""",
-            llm_config=self.llm_config,
-            human_input_mode="NEVER",
-            max_consecutive_auto_reply=1
-        )
-
-        # Configure ConcallAnalysisAgent
-        self.agents['concall'] = ConversableAgent(
-            name="ConcallAnalysisAgent",
-            system_message=base_system_msg + """
-Specialization: Extract insights from earnings calls, management commentary, and investor interactions.
-Coordinate with Guidance and Sentiment agents to analyze management tone and forward guidance.
-Focus on management quality, transparency, and strategic direction.""",
-            llm_config=self.llm_config,
-            human_input_mode="NEVER",
-            max_consecutive_auto_reply=1
-        )
-
-        # Configure RiskAnalysisAgent
-        self.agents['risk'] = ConversableAgent(
-            name="RiskAnalysisAgent",
-            system_message=base_system_msg + """
-Specialization: Identify and assess investment risks across multiple dimensions.
-Coordinate with News and Sentiment agents to understand market and operational risks.
-Provide comprehensive risk assessment with mitigation strategies.""",
-            llm_config=self.llm_config,
-            human_input_mode="NEVER",
-            max_consecutive_auto_reply=1
-        )
-
-        logger.info(f"Configured {len(self.agents)} macro agents")
-
     def _get_ticker_for_company(self, company_name: str) -> str:
-        """Get ticker symbol for a company name"""
-        # Known company-ticker mappings
-        ticker_mappings = {
-            "Ganesha Ecosphere Limited": "GANECOS.NS",
-            "Tata Motors": "TATAMOTORS.NS",
-            "Reliance Industries": "RELIANCE.NS",
-            "Infosys": "INFY.NS",
-            "HDFC Bank": "HDFCBANK.NS",
-            "ITC": "ITC.NS",
-            "Bharti Airtel": "BHARTIARTL.NS",
-            "State Bank of India": "SBIN.NS",
-            "Larsen & Toubro": "LT.NS",
-            "Asian Paints": "ASIANPAINT.NS"
-        }
-        
-        # Direct lookup
-        if company_name in ticker_mappings:
-            return ticker_mappings[company_name]
-        
-        # Try variations
-        for known_name, ticker in ticker_mappings.items():
-            if company_name.lower() in known_name.lower() or known_name.lower() in company_name.lower():
-                return ticker
-        
-        # Generate ticker from company name
-        # Remove common suffixes and convert to uppercase
-        clean_name = company_name.replace(" Limited", "").replace(" Ltd", "").replace(" Private", "").replace(" Pvt", "")
-        words = clean_name.split()
-        
-        if len(words) == 1:
-            ticker = words[0][:6].upper()
-        elif len(words) == 2:
-            ticker = (words[0][:4] + words[1][:2]).upper()
-        else:
-            # Take first letters of each word
-            ticker = "".join([word[0] for word in words[:6]]).upper()
-        
-        return f"{ticker}.NS"
+        """Get ticker symbol for a company name using micro agent"""
+        try:
+            # Use TickerResolutionAgent from micro agents
+            ticker_result = self.micro_agents.resolve_ticker(company_name)
+            if ticker_result and hasattr(ticker_result, 'success') and ticker_result.success:
+                return ticker_result.data.get('ticker', f"{company_name.upper()}.NS")
+            
+            # Fallback to basic logic
+            clean_name = company_name.replace(" Limited", "").replace(" Ltd", "").replace(" Private", "").replace(" Pvt", "")
+            words = clean_name.split()
+            
+            if len(words) == 1:
+                ticker = words[0][:6].upper()
+            elif len(words) == 2:
+                ticker = (words[0][:4] + words[1][:2]).upper()
+            else:
+                ticker = "".join([word[0] for word in words[:6]]).upper()
+            
+            return f"{ticker}.NS"
+            
+        except Exception as e:
+            logger.warning(f"Ticker resolution failed for {company_name}: {e}")
+            return f"{company_name.upper().replace(' ', '')}.NS"
 
-    def _analyze_news_sentiment(self, text: str) -> str:
-        """Simple sentiment analysis for news text"""
-        if not text:
-            return "neutral"
-        
-        text_lower = text.lower()
-        
-        # Positive keywords
-        positive_words = ['growth', 'profit', 'gain', 'increase', 'rise', 'up', 'positive', 'strong', 'good', 'excellent', 'beat', 'outperform']
-        # Negative keywords  
-        negative_words = ['loss', 'decline', 'fall', 'down', 'negative', 'weak', 'poor', 'miss', 'underperform', 'concern', 'risk', 'challenge']
-        
-        positive_count = sum(1 for word in positive_words if word in text_lower)
-        negative_count = sum(1 for word in negative_words if word in text_lower)
-        
-        if positive_count > negative_count:
-            return "positive"
-        elif negative_count > positive_count:
-            return "negative"
-        else:
-            return "neutral"
+    async def _query_mongodb_fallback(self, query: str, company_name: str, category: str = None) -> List[Dict[str, Any]]:
+        """Query MongoDB as fallback when micro agents fail"""
+        try:
+            if not self.mongo_client:
+                return []
+            
+            db = self.mongo_client.alphasage
+            collection = db.financial_data
+            
+            # Build query
+            mongo_query = {"$text": {"$search": f"{company_name} {query}"}}
+            if category:
+                mongo_query["category"] = category
+            
+            # Execute query
+            results = list(collection.find(mongo_query).limit(10))
+            
+            # Transform results
+            fallback_data = []
+            for doc in results:
+                fallback_data.append({
+                    "_id": str(doc.get("_id", "")),
+                    "content": doc.get("content", {}),
+                    "source": doc.get("source", "mongodb"),
+                    "timestamp": doc.get("timestamp", datetime.now().isoformat())
+                })
+            
+            logger.info(f"MongoDB fallback returned {len(fallback_data)} results for {company_name}")
+            return fallback_data
+            
+        except Exception as e:
+            logger.warning(f"MongoDB fallback failed: {e}")
+            return []
 
     async def retry_micro_call(self, func: Callable, *args, max_attempts: int = 3, **kwargs) -> Any:
-        """Retry micro agent calls with exponential backoff"""
+        """Enhanced retry mechanism with MongoDB fallback"""
         attempt = 0
         last_exception = None
+        company_name = kwargs.get('company_name', args[0] if args else None)
         
         # Ensure max_attempts is an integer
         if isinstance(max_attempts, str):
@@ -323,9 +429,32 @@ Provide comprehensive risk assessment with mitigation strategies.""",
         while attempt < max_attempts:
             try:
                 if asyncio.iscoroutinefunction(func):
-                    return await func(*args, **kwargs)
+                    result = await func(*args, **kwargs)
                 else:
-                    return func(*args, **kwargs)
+                    result = func(*args, **kwargs)
+                
+                # Check if result is valid
+                if result and hasattr(result, 'success') and result.success:
+                    return result
+                elif result:
+                    # If result exists but not successful, try MongoDB fallback
+                    if company_name and self.mongo_client:
+                        fallback_data = await self._query_mongodb_fallback(
+                            func.__name__,
+                            company_name,
+                            kwargs.get('category')
+                        )
+                        if fallback_data:
+                            # Create a new AgentResult with fallback data
+                            return AgentResult(
+                                agent_name=result.agent_name,
+                                data=fallback_data,
+                                sources=result.sources + ["mongodb_fallback"],
+                                execution_time=result.execution_time,
+                                success=True
+                            )
+                    return result  # Return even if not successful
+                    
             except Exception as e:
                 attempt += 1
                 last_exception = e
@@ -338,30 +467,28 @@ Provide comprehensive risk assessment with mitigation strategies.""",
                 logger.warning(f"Micro agent call attempt {attempt} failed, retrying in {wait_time}s: {str(e)}")
                 await asyncio.sleep(wait_time)
         
-        # Return a default AgentResult instead of raising exception
-        if hasattr(last_exception, '__class__') and 'AgentResult' in str(last_exception.__class__):
-            return last_exception
+        # Try MongoDB fallback as last resort
+        if company_name and self.mongo_client:
+            try:
+                fallback_data = await self._query_mongodb_fallback(
+                    func.__name__,
+                    company_name,
+                    kwargs.get('category')
+                )
+                if fallback_data:
+                    return AgentResult(
+                        agent_name=func.__name__.replace('_', ' ').title() + "Agent",
+                        data=fallback_data,
+                        sources=["mongodb_fallback"],
+                        execution_time=0.0,
+                        success=True
+                    )
+            except Exception as fallback_error:
+                logger.error(f"MongoDB fallback also failed: {str(fallback_error)}")
         
-        # Create a fallback AgentResult for micro agent calls
-        from dataclasses import dataclass
-        
-        @dataclass
-        class FallbackAgentResult:
-            agent_name: str = "Unknown"
-            data: dict = None
-            sources: list = None
-            execution_time: float = 0.0
-            success: bool = False
-            error: str = None
-            
-            def __post_init__(self):
-                if self.data is None:
-                    self.data = {}
-                if self.sources is None:
-                    self.sources = []
-        
-        return FallbackAgentResult(
-            agent_name="MicroAgent",
+        # Create fallback AgentResult
+        return AgentResult(
+            agent_name=func.__name__.replace('_', ' ').title() + "Agent",
             data={},
             sources=[],
             execution_time=0.0,
@@ -378,7 +505,7 @@ Provide comprehensive risk assessment with mitigation strategies.""",
         logger.error(traceback.format_exc())
 
     async def analyze_business(self, company_name: str) -> MacroAgentResult:
-        """BusinessResearchAgent: Analyze business model, products, and services"""
+        """Enhanced business analysis with proper micro agent integration"""
         start_time = time.time()
         cache_key = generate_cache_key("business_analysis", company_name=company_name)
         
@@ -386,7 +513,7 @@ Provide comprehensive risk assessment with mitigation strategies.""",
         cached_result = get_cached_result(cache_key)
         if cached_result:
             return MacroAgentResult(
-                agent_name="BusinessResearchAgent",
+                agent_name="BusinessAnalysisAgent",
                 data=cached_result,
                 sources=cached_result.get('sources', []),
                 execution_time=time.time() - start_time,
@@ -401,265 +528,83 @@ Provide comprehensive risk assessment with mitigation strategies.""",
             micro_agents_used = []
             tools_used = []
             
-            # Get ticker for the company
             ticker = self._get_ticker_for_company(company_name)
             
-            # Use HistoricalDataAgent to understand business evolution
-            try:
-                historical_result = await self.retry_micro_call(
-                    self.micro_agents.fetch_historical_data,
-                    ticker,
-                    company_name,
-                    5  # years
+            # Fixed: Use the correct method name
+            overview_result = await self.retry_micro_call(
+                self.micro_agents.get_company_overview,
+                company_name
+            )
+            if overview_result and overview_result.success:
+                micro_agents_used.append("CompanyOverviewAgent")
+                sources.extend(overview_result.sources)
+            
+            # Use BusinessModelAgent
+            business_model_result = await self.retry_micro_call(
+                self.micro_agents.analyze_business_model,
+                company_name=company_name
+            )
+            if business_model_result.success:
+                micro_agents_used.append("BusinessModelAgent")
+                sources.extend(business_model_result.sources)
+            
+            # Use YFinanceNumberTool for financial metrics
+            financial_data = await YFinanceAgentTool.fetch_financial_data(
+                ticker,
+                "market cap revenue profit"
+            )
+            if financial_data and financial_data.get('success'):
+                tools_used.append("YFinanceNumberTool")
+                sources.extend(financial_data.get('sources', []))
+            
+            # Use VectorSearchRAGTool for business insights
+            business_chunks = await VectorSearchTool.search_knowledge_base(
+                query=f"{company_name} business model strategy competitive advantage",
+                company_name=company_name,
+                filters={"category": "Business Analysis"},
+                max_results=5
+            )
+            if business_chunks:
+                tools_used.append("VectorSearchRAGTool")
+                sources.extend([f"chunk_{chunk.get('_id', 'unknown')}" for chunk in business_chunks])
+            
+            # MongoDB fallback if insufficient data
+            if not business_chunks or len(business_chunks) < 2:
+                fallback_data = await self._query_mongodb_fallback(
+                    "business model strategy competitive", 
+                    company_name, 
+                    "Business Analysis"
                 )
-                if historical_result and hasattr(historical_result, 'success') and historical_result.success:
-                    micro_agents_used.append("HistoricalDataAgent")
-                    sources.extend(historical_result.sources)
-            except Exception as e:
-                logger.warning(f"HistoricalDataAgent failed: {e}")
-                historical_result = None
+                if fallback_data:
+                    business_chunks.extend(fallback_data)
+                    sources.extend([f"mongodb_{item.get('_id', 'unknown')}" for item in fallback_data])
             
-            # Use GuidanceExtractionAgent to understand strategic direction
-            try:
-                guidance_result = await self.retry_micro_call(
-                    self.micro_agents.extract_guidance,
-                    company_name
-                )
-                if guidance_result and hasattr(guidance_result, 'success') and guidance_result.success:
-                    micro_agents_used.append("GuidanceExtractionAgent")
-                    sources.extend(guidance_result.sources)
-            except Exception as e:
-                logger.warning(f"GuidanceExtractionAgent failed: {e}")
-                guidance_result = None
+            # Use ReasoningTool for synthesis
+            reasoning_data = {
+                "overview": overview_result.data if overview_result.success else {},
+                "business_model": business_model_result.data if business_model_result.success else {},
+                "financial": financial_data.get('data', {}) if financial_data else {},
+                "chunks_count": len(business_chunks)
+            }
             
-            # Use YFinanceNumberTool to get financial metrics
-            try:
-                financial_data = await YFinanceNumberTool.fetch_financial_data(
-                    ticker,
-                    "revenue"
-                )
-                if financial_data and financial_data.get('success'):
-                    tools_used.append("YFinanceNumberTool")
-                    sources.extend(financial_data.get('sources', []))
-            except Exception as e:
-                logger.warning(f"YFinanceNumberTool failed: {e}")
-                financial_data = None
+            business_reasoning = await ReasoningTool.reason_on_data(
+                json.dumps(reasoning_data),
+                f"Analyze the business model and competitive advantages of {company_name}. What are the key strengths and strategic positioning?"
+            )
+            if business_reasoning:
+                tools_used.append("ReasoningTool")
             
-            # Use VectorSearchRAGTool to find business model information
-            try:
-                business_chunks = await VectorSearchRAGTool.search_knowledge_base(
-                    query="business model products services operations revenue streams",
-                    company_name=company_name,
-                    filters={"category": "Company Info"},
-                    max_results=5
-                )
-                if business_chunks:
-                    tools_used.append("VectorSearchRAGTool")
-                    for chunk in business_chunks:
-                        sources.append(f"chunk_{chunk.get('_id', 'unknown')}")
-            except Exception as e:
-                logger.warning(f"VectorSearchRAGTool failed: {e}")
-                business_chunks = []
-            
-            # Use ArithmeticCalculationTool for business metrics
-            try:
-                if financial_data and financial_data.get('data'):
-                    revenue = financial_data['data'].get('revenue', 100)
-                    business_metrics = ArithmeticCalculationTool.calculate_metrics(
-                        {"revenue": revenue},
-                        "revenue_per_share = revenue / 1000000"
-                    )
-                    if business_metrics:
-                        tools_used.append("ArithmeticCalculationTool")
-            except Exception as e:
-                logger.warning(f"ArithmeticCalculationTool failed: {e}")
-            
-            # Synthesize business analysis using ReasoningTool
-            analysis_data = {
+            # Compile business analysis data
+            result_data = {
                 "company_name": company_name,
                 "ticker": ticker,
-                "historical": historical_result.data if historical_result and hasattr(historical_result, 'data') else {},
-                "guidance": guidance_result.data if guidance_result and hasattr(guidance_result, 'data') else {},
-                "financial": financial_data.get('data', {}) if financial_data else {},
-                "business_chunks": len(business_chunks) if business_chunks else 0
-            }
-            
-            try:
-                business_reasoning = await ReasoningTool.reason_on_data(
-                    json.dumps(analysis_data),
-                    f"Analyze the business model of {company_name}. What are their core products/services, revenue streams, competitive advantages, and growth strategy? Provide a comprehensive business overview."
-                )
-                if business_reasoning:
-                    tools_used.append("ReasoningTool")
-            except Exception as e:
-                logger.warning(f"ReasoningTool failed: {e}")
-                business_reasoning = {"reasoning": f"Business analysis for {company_name} based on available data"}
-            
-            # Extract products and services from chunks
-            products = []
-            business_model = business_reasoning.get('reasoning', f'Business model analysis for {company_name}')
-            
-            for chunk in business_chunks[:3]:  # Analyze top 3 chunks
-                try:
-                    content = chunk.get('content', {})
-                    if content.get('text'):
-                        # Simple keyword extraction for products
-                        text = content['text'].lower()
-                        if any(keyword in text for keyword in ['products', 'services', 'manufacturing', 'business']):
-                            products.append(content['text'][:100] + "...")
-                except Exception as e:
-                    logger.warning(f"Failed to extract from chunk: {e}")
-            
-            # Add fallback products if none found
-            if not products:
-                if "Environmental Services" in company_name or "Ecosphere" in company_name:
-                    products = [
-                        "Environmental waste management services",
-                        "Recycling and sustainability solutions",
-                        "Eco-friendly business operations"
-                    ]
-                else:
-                    products = ["Business operations and services"]
-            
-            result_data = {
-                "business_model": business_model,
-                "products": products[:5],  # Top 5 products/services
-                "strategic_guidance": guidance_result.data.get('guidance', 'Strategic direction being evaluated') if guidance_result and hasattr(guidance_result, 'data') else 'Strategic direction being evaluated',
-                "historical_context": f"Analyzed {historical_result.data.get('years_analyzed', 5)} years of data" if historical_result and hasattr(historical_result, 'data') else f'Historical analysis for {company_name}',
-                "ticker": ticker,
-                "sources": list(set(sources)),
-                "micro_agents_used": micro_agents_used,
-                "tools_used": tools_used,
-                "timestamp": datetime.now().isoformat()
-            }
-            
-            # Cache the result
-            cache_result(cache_key, result_data, ttl=7200)  # 2 hours
-            
-            return MacroAgentResult(
-                agent_name="BusinessResearchAgent",
-                data=result_data,
-                sources=sources,
-                execution_time=time.time() - start_time,
-                success=True,
-                micro_agents_used=micro_agents_used,
-                tools_used=tools_used,
-                cache_key=cache_key
-            )
-            
-        except Exception as e:
-            self.log_macro_error(e, {"company_name": company_name})
-            return MacroAgentResult(
-                agent_name="BusinessResearchAgent",
-                data={
-                    "business_model": f"Business analysis for {company_name} encountered issues",
-                    "products": [f"{company_name} business operations"],
-                    "strategic_guidance": "Analysis in progress",
-                    "historical_context": "Data being processed",
-                    "ticker": self._get_ticker_for_company(company_name),
-                    "sources": [],
-                    "micro_agents_used": [],
-                    "tools_used": [],
-                    "timestamp": datetime.now().isoformat()
-                },
-                sources=[],
-                execution_time=time.time() - start_time,
-                success=True,  # Return success with fallback data
-                micro_agents_used=[],
-                tools_used=[],
-                error=None  # Don't expose internal errors
-            )
-
-    async def analyze_sector(self, sector: str, company_name: str) -> MacroAgentResult:
-        """SectorResearchAgent: Evaluate sector trends, regulations, and competitive dynamics"""
-        start_time = time.time()
-        cache_key = generate_cache_key("sector_analysis", sector=sector, company_name=company_name)
-        
-        # Check cache first
-        cached_result = get_cached_result(cache_key)
-        if cached_result:
-            return MacroAgentResult(
-                agent_name="SectorResearchAgent",
-                data=cached_result,
-                sources=cached_result.get('sources', []),
-                execution_time=time.time() - start_time,
-                success=True,
-                micro_agents_used=cached_result.get('micro_agents_used', []),
-                tools_used=cached_result.get('tools_used', []),
-                cache_key=cache_key
-            )
-        
-        try:
-            sources = []
-            micro_agents_used = []
-            tools_used = []
-            
-            ticker = self._get_ticker_for_company(company_name)
-            
-            # Use NewsAnalysisAgent to understand sector trends
-            try:
-                news_result = await self.retry_micro_call(
-                    self.micro_agents.analyze_news,
-                    ticker
-                )
-                if news_result and hasattr(news_result, 'success') and news_result.success:
-                    micro_agents_used.append("NewsAnalysisAgent")
-                    sources.extend(news_result.sources)
-            except Exception as e:
-                logger.warning(f"NewsAnalysisAgent failed: {e}")
-                news_result = None
-            
-            # Use SentimentAnalysisAgent for sector sentiment
-            try:
-                sector_sentiment = await self.retry_micro_call(
-                    self.micro_agents.analyze_sentiment,
-                    company_name,
-                    f"{sector} sector trends regulations competition"
-                )
-                if sector_sentiment and hasattr(sector_sentiment, 'success') and sector_sentiment.success:
-                    micro_agents_used.append("SentimentAnalysisAgent")
-                    sources.extend(sector_sentiment.sources)
-            except Exception as e:
-                logger.warning(f"SentimentAnalysisAgent failed: {e}")
-                sector_sentiment = None
-            
-            # Search for sector-related information
-            try:
-                sector_chunks = await VectorSearchRAGTool.search_knowledge_base(
-                    query=f"{sector} industry trends regulations competitive landscape",
-                    company_name=company_name,
-                    max_results=5
-                )
-                if sector_chunks:
-                    tools_used.append("VectorSearchRAGTool")
-                    for chunk in sector_chunks:
-                        sources.append(f"chunk_{chunk.get('_id', 'unknown')}")
-            except Exception as e:
-                logger.warning(f"VectorSearchRAGTool failed: {e}")
-                sector_chunks = []
-            
-            # Generate sector trends based on sector type
-            if "Environmental" in sector:
-                trends = f"The {sector} sector is experiencing growth due to increased environmental awareness, regulatory support for sustainable practices, and corporate ESG initiatives. Key trends include waste management innovation, circular economy adoption, and green technology integration."
-                risks = ["Regulatory changes", "Market competition", "Technology disruption"]
-            else:
-                trends = f"The {sector} sector shows ongoing development with various market dynamics affecting {company_name} and similar companies."
-                risks = ["Market volatility", "Industry competition", "Economic factors"]
-            
-            # Extract risks from news analysis if available
-            if news_result and hasattr(news_result, 'data'):
-                articles = news_result.data.get('articles', [])
-                for article in articles[:3]:
-                    if 'negative' in article.get('sentiment', '').lower():
-                        risks.append(article.get('title', 'Unknown risk'))
-            
-            result_data = {
-                "sector": sector,
-                "trends": trends,
-                "risks": risks[:5],  # Top 5 risks
-                "sentiment_overview": sector_sentiment.data.get('sentiment', 'Neutral') if sector_sentiment and hasattr(sector_sentiment, 'data') else 'Neutral',
-                "news_summary": f"Analyzed {news_result.data.get('news_count', 0)} news articles" if news_result and hasattr(news_result, 'data') else 'News analysis in progress',
-                "company_context": company_name,
+                "business_summary": overview_result.data.get('summary', '') if overview_result.success else '',
+                "business_model": business_model_result.data.get('model', '') if business_model_result.success else '',
+                "sector": overview_result.data.get('sector', '') if overview_result.success else '',
+                "industry": overview_result.data.get('industry', '') if overview_result.success else '',
+                "market_cap": financial_data.get('data', {}).get('market_cap', 0) if financial_data else 0,
+                "competitive_advantages": business_model_result.data.get('advantages', []) if business_model_result.success else [],
+                "analysis": business_reasoning.get('reasoning', '') if business_reasoning else '',
                 "sources": list(set(sources)),
                 "micro_agents_used": micro_agents_used,
                 "tools_used": tools_used,
@@ -670,7 +615,7 @@ Provide comprehensive risk assessment with mitigation strategies.""",
             cache_result(cache_key, result_data, ttl=3600)  # 1 hour
             
             return MacroAgentResult(
-                agent_name="SectorResearchAgent",
+                agent_name="BusinessAnalysisAgent",
                 data=result_data,
                 sources=sources,
                 execution_time=time.time() - start_time,
@@ -681,31 +626,154 @@ Provide comprehensive risk assessment with mitigation strategies.""",
             )
             
         except Exception as e:
-            self.log_macro_error(e, {"sector": sector, "company_name": company_name})
+            logger.error(f"Business analysis failed for {company_name}: {str(e)}")
             return MacroAgentResult(
-                agent_name="SectorResearchAgent",
+                agent_name="BusinessAnalysisAgent",
                 data={
-                    "sector": sector,
-                    "trends": f"Sector analysis for {sector} affecting {company_name}",
-                    "risks": ["Market risks", "Sector-specific challenges"],
-                    "sentiment_overview": "Neutral",
-                    "news_summary": "Analysis in progress",
-                    "company_context": company_name,
-                    "sources": [],
-                    "micro_agents_used": [],
-                    "tools_used": [],
+                    "company_name": company_name,
+                    "analysis_type": "business",
+                    "error": str(e),
+                    "macro_analysis": {},  # Empty fallback
                     "timestamp": datetime.now().isoformat()
                 },
                 sources=[],
                 execution_time=time.time() - start_time,
-                success=True,  # Return success with fallback data
+                success=False,
                 micro_agents_used=[],
                 tools_used=[],
-                error=None
+                error=str(e)
+            )
+
+    async def analyze_sector(self, company_name: str, sector: str = None) -> MacroAgentResult:
+        """Enhanced sector analysis with proper micro agent integration"""
+        start_time = time.time()
+        cache_key = generate_cache_key("sector_analysis", company_name=company_name, sector=sector)
+        
+        # Check cache first
+        cached_result = get_cached_result(cache_key)
+        if cached_result:
+            return MacroAgentResult(
+                agent_name="SectorAnalysisAgent",
+                data=cached_result,
+                sources=cached_result.get('sources', []),
+                execution_time=time.time() - start_time,
+                success=True,
+                micro_agents_used=cached_result.get('micro_agents_used', []),
+                tools_used=cached_result.get('tools_used', []),
+                cache_key=cache_key
+            )
+        
+        try:
+            sources = []
+            micro_agents_used = []
+            tools_used = []
+            
+            ticker = self._get_ticker_for_company(company_name)
+            
+            # Use SectorAnalysisAgent
+            sector_result = await self.retry_micro_call(
+                self.micro_agents.analyze_sector,
+                sector or "Unknown",
+                company_name
+            )
+            if sector_result.success:
+                micro_agents_used.append("SectorAnalysisAgent")
+                sources.extend(sector_result.sources)
+            
+            # Use CompetitorAnalysisAgent
+            competitor_result = await self.retry_micro_call(
+                self.micro_agents.analyze_competitors,
+                company_name,
+                sector or "Unknown"
+            )
+            if competitor_result.success:
+                micro_agents_used.append("CompetitorAnalysisAgent")
+                sources.extend(competitor_result.sources)
+            
+            # Use VectorSearchRAGTool for sector data
+            sector_chunks = await VectorSearchTool.search_knowledge_base(
+                query=f"{sector or company_name} sector industry trends analysis competitors",
+                company_name=company_name,
+                filters={"category": "Sector Analysis"},
+                max_results=5
+            )
+            if sector_chunks:
+                tools_used.append("VectorSearchRAGTool")
+                sources.extend([f"chunk_{chunk.get('_id', 'unknown')}" for chunk in sector_chunks])
+            
+            # MongoDB fallback
+            if not sector_chunks or len(sector_chunks) < 2:
+                fallback_data = await self._query_mongodb_fallback(
+                    f"sector industry trends {sector or ''}", 
+                    company_name, 
+                    "Sector Analysis"
+                )
+                if fallback_data:
+                    sector_chunks.extend(fallback_data)
+                    sources.extend([f"mongodb_{item.get('_id', 'unknown')}" for item in fallback_data])
+            
+            # Use ReasoningTool for sector analysis
+            reasoning_data = {
+                "sector_analysis": sector_result.data if sector_result.success else {},
+                "competitor_analysis": competitor_result.data if competitor_result.success else {},
+                "sector": sector,
+                "company": company_name
+            }
+            
+            sector_reasoning = await ReasoningTool.reason_on_data(
+                json.dumps(reasoning_data),
+                f"Analyze the sector dynamics and competitive landscape for {company_name} in the {sector or 'relevant'} sector."
+            )
+            if sector_reasoning:
+                tools_used.append("ReasoningTool")
+            
+            result_data = {
+                "company_name": company_name,
+                "sector": sector or sector_result.data.get('sector', 'Unknown') if sector_result.success else 'Unknown',
+                "sector_trends": sector_result.data.get('trends', []) if sector_result.success else [],
+                "competitors": competitor_result.data.get('competitors', []) if competitor_result.success else [],
+                "market_position": competitor_result.data.get('position', 'Unknown') if competitor_result.success else 'Unknown',
+                "analysis": sector_reasoning.get('reasoning', '') if sector_reasoning else '',
+                "sources": list(set(sources)),
+                "micro_agents_used": micro_agents_used,
+                "tools_used": tools_used,
+                "timestamp": datetime.now().isoformat()
+            }
+            
+            # Cache the result
+            cache_result(cache_key, result_data, ttl=3600)  # 1 hour
+            
+            return MacroAgentResult(
+                agent_name="SectorAnalysisAgent",
+                data=result_data,
+                sources=sources,
+                execution_time=time.time() - start_time,
+                success=True,
+                micro_agents_used=micro_agents_used,
+                tools_used=tools_used,
+                cache_key=cache_key
+            )
+            
+        except Exception as e:
+            self.log_macro_error(e, {"company_name": company_name, "sector": sector})
+            return MacroAgentResult(
+                agent_name="SectorAnalysisAgent",
+                data={
+                    "company_name": company_name,
+                    "sector": sector or "Unknown",
+                    "error_message": "Sector analysis in progress",
+                    "timestamp": datetime.now().isoformat()
+                },
+                sources=[],
+                execution_time=time.time() - start_time,
+                success=False,
+                micro_agents_used=[],
+                tools_used=[],
+                error=str(e)
             )
 
     async def deep_dive_company(self, company_name: str) -> MacroAgentResult:
-        """CompanyDeepDiveAgent: Comprehensive company analysis including history and management"""
+        """Enhanced deep dive analysis with proper micro agent integration"""
         start_time = time.time()
         cache_key = generate_cache_key("company_deepdive", company_name=company_name)
         
@@ -728,10 +796,12 @@ Provide comprehensive risk assessment with mitigation strategies.""",
             micro_agents_used = []
             tools_used = []
             
-            # Use HistoricalDataAgent for company evolution
+            ticker = self._get_ticker_for_company(company_name)
+            
+            # Use HistoricalDataAgent
             historical_result = await self.retry_micro_call(
                 self.micro_agents.fetch_historical_data,
-                "TATAMOTORS.NS" if "Tata Motors" in company_name else f"{company_name}.NS",
+                ticker,
                 company_name,
                 years=10
             )
@@ -739,59 +809,69 @@ Provide comprehensive risk assessment with mitigation strategies.""",
                 micro_agents_used.append("HistoricalDataAgent")
                 sources.extend(historical_result.sources)
             
-            # Use SentimentAnalysisAgent for management perception
-            sentiment_result = await self.retry_micro_call(
-                self.micro_agents.analyze_sentiment,
-                company_name,
-                "management leadership governance corporate culture"
+            # Use ManagementAnalysisAgent
+            management_result = await self.retry_micro_call(
+                self.micro_agents.analyze_management,
+                company_name
             )
-            if sentiment_result.success:
-                micro_agents_used.append("SentimentAnalysisAgent")
-                sources.extend(sentiment_result.sources)
+            if management_result.success:
+                micro_agents_used.append("ManagementAnalysisAgent")
+                sources.extend(management_result.sources)
             
-            # Search for company information
-            company_chunks = await self.retry_micro_call(
-                VectorSearchRAGTool.search_knowledge_base,
-                query="company history management leadership governance founding",
+            # Use GovernanceAnalysisAgent
+            governance_result = await self.retry_micro_call(
+                self.micro_agents.analyze_governance,
+                company_name
+            )
+            if governance_result.success:
+                micro_agents_used.append("GovernanceAnalysisAgent")
+                sources.extend(governance_result.sources)
+            
+            # Use VectorSearchRAGTool for comprehensive data
+            company_chunks = await VectorSearchTool.search_knowledge_base(
+                query=f"{company_name} history management governance milestones achievements",
                 company_name=company_name,
-                filters={"category": "Company Info"},
-                max_results=5
+                max_results=10
             )
             if company_chunks:
                 tools_used.append("VectorSearchRAGTool")
-                for chunk in company_chunks:
-                    sources.append(f"chunk_{chunk.get('_id', 'unknown')}")
+                sources.extend([f"chunk_{chunk.get('_id', 'unknown')}" for chunk in company_chunks])
             
-            # Synthesize company deep dive
-            deepdive_data = {
+            # MongoDB fallback for comprehensive data
+            if not company_chunks or len(company_chunks) < 5:
+                fallback_data = await self._query_mongodb_fallback(
+                    "history management governance milestones", 
+                    company_name
+                )
+                if fallback_data:
+                    company_chunks.extend(fallback_data)
+                    sources.extend([f"mongodb_{item.get('_id', 'unknown')}" for item in fallback_data])
+            
+            # Use ReasoningTool for comprehensive analysis
+            reasoning_data = {
                 "historical": historical_result.data if historical_result.success else {},
-                "sentiment": sentiment_result.data if sentiment_result.success else {},
-                "company_chunks": len(company_chunks) if company_chunks else 0
+                "management": management_result.data if management_result.success else {},
+                "governance": governance_result.data if governance_result.success else {},
+                "data_sources": len(company_chunks)
             }
             
-            deepdive_reasoning = await self.retry_micro_call(
-                ReasoningTool.reason_on_data,
-                json.dumps(deepdive_data),
-                f"Provide a comprehensive analysis of {company_name} including company history, key milestones, management team, governance structure, and corporate culture."
+            deepdive_reasoning = await ReasoningTool.reason_on_data(
+                json.dumps(reasoning_data),
+                f"Provide a comprehensive deep dive analysis of {company_name} including company history, management quality, governance structure, and strategic evolution."
             )
-            
             if deepdive_reasoning:
                 tools_used.append("ReasoningTool")
             
-            # Extract management information
-            management = []
-            for chunk in company_chunks[:3]:
-                content = chunk.get('content', {})
-                if content.get('text'):
-                    text = content['text'].lower()
-                    if any(keyword in text for keyword in ['management', 'ceo', 'director', 'leadership']):
-                        management.append(content['text'][:150] + "...")
-            
             result_data = {
-                "history": deepdive_reasoning.get('reasoning', 'Company history not available'),
-                "management": management[:5],  # Top 5 management insights
-                "governance_sentiment": sentiment_result.data.get('sentiment', 'Neutral') if sentiment_result.success else 'Neutral',
-                "historical_performance": f"Analyzed {historical_result.data.get('years_analyzed', 0)} years" if historical_result.success else 'No historical data',
+                "company_name": company_name,
+                "ticker": ticker,
+                "company_history": historical_result.data.get('history', '') if historical_result.success else '',
+                "key_milestones": historical_result.data.get('milestones', []) if historical_result.success else [],
+                "management_team": management_result.data.get('team', []) if management_result.success else [],
+                "management_quality": management_result.data.get('quality_score', 'Unknown') if management_result.success else 'Unknown',
+                "governance_score": governance_result.data.get('score', 'Unknown') if governance_result.success else 'Unknown',
+                "governance_highlights": governance_result.data.get('highlights', []) if governance_result.success else [],
+                "comprehensive_analysis": deepdive_reasoning.get('reasoning', '') if deepdive_reasoning else '',
                 "sources": list(set(sources)),
                 "micro_agents_used": micro_agents_used,
                 "tools_used": tools_used,
@@ -817,33 +897,28 @@ Provide comprehensive risk assessment with mitigation strategies.""",
             return MacroAgentResult(
                 agent_name="CompanyDeepDiveAgent",
                 data={
-                    "history": "Company history analysis in progress",
-                    "management": ["Management data being processed"],
-                    "governance_sentiment": "Neutral",
-                    "historical_performance": "Data being analyzed",
-                    "sources": [],
-                    "micro_agents_used": [],
-                    "tools_used": [],
+                    "company_name": company_name,
+                    "error_message": "Deep dive analysis in progress",
                     "timestamp": datetime.now().isoformat()
                 },
                 sources=[],
                 execution_time=time.time() - start_time,
-                success=True,  # Return success with fallback data
+                success=False,
                 micro_agents_used=[],
                 tools_used=[],
-                error=None
+                error=str(e)
             )
 
-    async def analyze_debt_wc(self, company_name: str) -> MacroAgentResult:
-        """DebtAndWorkingCapitalAgent: Analyze debt structure and working capital management"""
+    async def analyze_financials(self, company_name: str) -> MacroAgentResult:
+        """Enhanced financial analysis with proper micro agent integration"""
         start_time = time.time()
-        cache_key = generate_cache_key("debt_wc_analysis", company_name=company_name)
+        cache_key = generate_cache_key("financial_analysis", company_name=company_name)
         
         # Check cache first
         cached_result = get_cached_result(cache_key)
         if cached_result:
             return MacroAgentResult(
-                agent_name="DebtAndWorkingCapitalAgent",
+                agent_name="FinancialAnalysisAgent",
                 data=cached_result,
                 sources=cached_result.get('sources', []),
                 execution_time=time.time() - start_time,
@@ -858,50 +933,94 @@ Provide comprehensive risk assessment with mitigation strategies.""",
             micro_agents_used = []
             tools_used = []
             
-            # Use LeverageRatiosAgent for debt analysis
+            ticker = self._get_ticker_for_company(company_name)
+            
+            # Use ProfitabilityRatiosAgent
+            profitability_result = await self.retry_micro_call(
+                self.micro_agents.calculate_profitability_ratios,
+                ticker=ticker,
+                company_name=company_name
+            )
+            if profitability_result.success:
+                micro_agents_used.append("ProfitabilityRatiosAgent")
+                sources.extend(profitability_result.sources)
+            
+            # Use LeverageRatiosAgent
             leverage_result = await self.retry_micro_call(
                 self.micro_agents.calculate_leverage_ratios,
-                "TATAMOTORS.NS" if "Tata Motors" in company_name else f"{company_name}.NS",
-                company_name
+                ticker=ticker,
+                company_name=company_name
             )
             if leverage_result.success:
                 micro_agents_used.append("LeverageRatiosAgent")
                 sources.extend(leverage_result.sources)
             
-            # Use LiquidityRatiosAgent for working capital analysis
+            # Use LiquidityRatiosAgent
             liquidity_result = await self.retry_micro_call(
                 self.micro_agents.calculate_liquidity_ratios,
-                company_name
+                company_name=company_name
             )
             if liquidity_result.success:
                 micro_agents_used.append("LiquidityRatiosAgent")
                 sources.extend(liquidity_result.sources)
             
-            # Get debt-related data using YFinanceNumberTool
-            debt_equity_data = await self.retry_micro_call(
-                YFinanceNumberTool.fetch_financial_data,
-                "TATAMOTORS.NS" if "Tata Motors" in company_name else f"{company_name}.NS",
-                "debt to equity"
+            # Use EfficiencyRatiosAgent
+            efficiency_result = await self.retry_micro_call(
+                self.micro_agents.calculate_efficiency_ratios,
+                company_name=company_name
             )
-            if debt_equity_data and debt_equity_data.get('data'):
-                tools_used.append("YFinanceNumberTool")
-                sources.extend(debt_equity_data.get('sources', []))
+            if efficiency_result.success:
+                micro_agents_used.append("EfficiencyRatiosAgent")
+                sources.extend(efficiency_result.sources)
             
-            # Calculate working capital metrics using ArithmeticCalculationTool
-            if liquidity_result.success and liquidity_result.data.get('Current_Ratio'):
-                wc_calculation = ArithmeticCalculationTool.calculate_metrics(
-                    {"Current_Ratio": liquidity_result.data['Current_Ratio']},
-                    "Working_Capital_Health = Current_Ratio * 100"
+            # Use YFinanceNumberTool for additional financial data
+            financial_data = await YFinanceAgentTool.fetch_financial_data(
+                ticker,
+                "revenue profit debt cash flow"
+            )
+            if financial_data and financial_data.get('success'):
+                tools_used.append("YFinanceNumberTool")
+                sources.extend(financial_data.get('sources', []))
+            
+            # Use ArithmeticCalculationTool for custom calculations
+            if profitability_result.success and leverage_result.success:
+                calc_data = {
+                    "profit_margin": profitability_result.data.get('profit_margin', 0),
+                    "debt_equity": leverage_result.data.get('debt_equity', 0)
+                }
+                
+                financial_health = ArithmeticCalculationTool.calculate_metrics(
+                    calc_data,
+                    "financial_health = (profit_margin * 100) / (1 + debt_equity)"
                 )
-                if wc_calculation:
+                if financial_health:
                     tools_used.append("ArithmeticCalculationTool")
             
+            # Use ReasoningTool for financial analysis
+            reasoning_data = {
+                "profitability": profitability_result.data if profitability_result.success else {},
+                "leverage": leverage_result.data if leverage_result.success else {},
+                "liquidity": liquidity_result.data if liquidity_result.success else {},
+                "efficiency": efficiency_result.data if efficiency_result.success else {},
+                "market_data": financial_data.get('data', {}) if financial_data else {}
+            }
+            
+            financial_reasoning = await ReasoningTool.reason_on_data(
+                json.dumps(reasoning_data),
+                f"Analyze the financial health and performance of {company_name}. What are the key financial strengths and concerns?"
+            )
+            if financial_reasoning:
+                tools_used.append("ReasoningTool")
+            
             result_data = {
-                "debt_equity": leverage_result.data.get('Debt_Equity', 'N/A') if leverage_result.success else 'N/A',
-                "current_ratio": liquidity_result.data.get('Current_Ratio', 'N/A') if liquidity_result.success else 'N/A',
-                "quick_ratio": liquidity_result.data.get('Quick_Ratio', 'N/A') if liquidity_result.success else 'N/A',
-                "working_capital": f"{liquidity_result.data.get('Current_Ratio', 0):.2f}" if liquidity_result.success else 'N/A',
-                "debt_sustainability": "Manageable" if (leverage_result.success and leverage_result.data.get('Debt_Equity', 0) < 1.0) else "High leverage",
+                "company_name": company_name,
+                "ticker": ticker,
+                "profitability_ratios": profitability_result.data if profitability_result.success else {},
+                "leverage_ratios": leverage_result.data if leverage_result.success else {},
+                "liquidity_ratios": liquidity_result.data if liquidity_result.success else {},
+                "efficiency_ratios": efficiency_result.data if efficiency_result.success else {},
+                "financial_health_score": financial_health.get('financial_health', 'Unknown') if 'financial_health' in locals() else 'Unknown',
+                "financial_analysis": financial_reasoning.get('reasoning', '') if financial_reasoning else '',
                 "sources": list(set(sources)),
                 "micro_agents_used": micro_agents_used,
                 "tools_used": tools_used,
@@ -912,7 +1031,7 @@ Provide comprehensive risk assessment with mitigation strategies.""",
             cache_result(cache_key, result_data, ttl=3600)  # 1 hour
             
             return MacroAgentResult(
-                agent_name="DebtAndWorkingCapitalAgent",
+                agent_name="FinancialAnalysisAgent",
                 data=result_data,
                 sources=sources,
                 execution_time=time.time() - start_time,
@@ -925,28 +1044,22 @@ Provide comprehensive risk assessment with mitigation strategies.""",
         except Exception as e:
             self.log_macro_error(e, {"company_name": company_name})
             return MacroAgentResult(
-                agent_name="DebtAndWorkingCapitalAgent",
+                agent_name="FinancialAnalysisAgent",
                 data={
-                    "debt_equity": "Data not available",
-                    "current_ratio": "Data not available",
-                    "quick_ratio": "Data not available",
-                    "working_capital": "Data not available",
-                    "debt_sustainability": "Data not available",
-                    "sources": [],
-                    "micro_agents_used": [],
-                    "tools_used": [],
+                    "company_name": company_name,
+                    "error_message": "Financial analysis in progress",
                     "timestamp": datetime.now().isoformat()
                 },
                 sources=[],
                 execution_time=time.time() - start_time,
-                success=True,  # Return success with fallback data
+                success=False,
                 micro_agents_used=[],
                 tools_used=[],
-                error=None
+                error=str(e)
             )
 
     async def analyze_current_affairs(self, company_name: str) -> MacroAgentResult:
-        """CurrentAffairsAgent: Summarize recent events and developments"""
+        """Enhanced current affairs analysis with proper micro agent integration"""
         start_time = time.time()
         cache_key = generate_cache_key("current_affairs", company_name=company_name)
         
@@ -969,117 +1082,99 @@ Provide comprehensive risk assessment with mitigation strategies.""",
             micro_agents_used = []
             tools_used = []
             
-            # Use NewsAnalysisAgent for recent news
             ticker = self._get_ticker_for_company(company_name)
             
-            try:
-                news_result = await self.retry_micro_call(
-                    self.micro_agents.analyze_news,
-                    ticker
-                )
-                if news_result and hasattr(news_result, 'success') and news_result.success:
-                    micro_agents_used.append("NewsAnalysisAgent")
-                    sources.extend(news_result.sources)
-            except Exception as e:
-                logger.warning(f"NewsAnalysisAgent failed: {e}")
-                news_result = None
+            # Use NewsAnalysisAgent
+            news_result = await self.retry_micro_call(
+                self.micro_agents.analyze_news,
+                ticker=ticker,
+                company_name=company_name
+            )
+            if news_result.success:
+                micro_agents_used.append("NewsAnalysisAgent")
+                sources.extend(news_result.sources)
             
-            # Use SentimentAnalysisAgent for current sentiment
-            try:
-                sentiment_result = await self.retry_micro_call(
-                    self.micro_agents.analyze_sentiment,
-                    company_name,
-                    "recent developments current events market sentiment"
-                )
-                if sentiment_result and hasattr(sentiment_result, 'success') and sentiment_result.success:
-                    micro_agents_used.append("SentimentAnalysisAgent")
-                    sources.extend(sentiment_result.sources)
-            except Exception as e:
-                logger.warning(f"SentimentAnalysisAgent failed: {e}")
-                sentiment_result = None
+            # Use SentimentAnalysisAgent
+            sentiment_result = await self.retry_micro_call(
+                self.micro_agents.analyze_sentiment,
+                company_name=company_name,
+                text="recent developments current events market sentiment news"
+            )
+            if sentiment_result.success:
+                micro_agents_used.append("SentimentAnalysisAgent")
+                sources.extend(sentiment_result.sources)
             
-            # Get recent news using YFinanceNewsTool
-            try:
-                recent_news = await YFinanceNewsTool.fetch_company_news(
-                    ticker,
-                    max_results=15
-                )
-                if recent_news:
-                    tools_used.append("YFinanceNewsTool")
-                    sources.append("yfinance")
-            except Exception as e:
-                logger.warning(f"YFinanceNewsTool failed: {e}")
-                recent_news = []
+            # Use YFinanceNewsTool
+            recent_news = await YFinanceNewsTool.fetch_company_news(
+                ticker,
+                max_results=20
+            )
+            if recent_news:
+                tools_used.append("YFinanceNewsTool")
+                sources.append("yfinance_news")
             
             # Use VectorSearchRAGTool for recent developments
-            try:
-                current_chunks = await VectorSearchRAGTool.search_knowledge_base(
-                    query=f"{company_name} recent news developments events announcements",
-                    company_name=company_name,
-                    max_results=5
+            current_chunks = await VectorSearchTool.search_knowledge_base(
+                query=f"{company_name} recent news developments events announcements current",
+                company_name=company_name,
+                max_results=10
+            )
+            if current_chunks:
+                tools_used.append("VectorSearchRAGTool")
+                sources.extend([f"chunk_{chunk.get('_id', 'unknown')}" for chunk in current_chunks])
+            
+            # MongoDB fallback for recent data
+            if not current_chunks or len(current_chunks) < 3:
+                fallback_data = await self._query_mongodb_fallback(
+                    "recent news developments events announcements", 
+                    company_name
                 )
-                if current_chunks:
-                    tools_used.append("VectorSearchRAGTool")
-                    for chunk in current_chunks:
-                        sources.append(f"chunk_{chunk.get('_id', 'unknown')}")
-            except Exception as e:
-                logger.warning(f"VectorSearchRAGTool failed: {e}")
-                current_chunks = []
+                if fallback_data:
+                    current_chunks.extend(fallback_data)
+                    sources.extend([f"mongodb_{item.get('_id', 'unknown')}" for item in fallback_data])
             
             # Use ReasoningTool for event analysis
-            try:
-                if recent_news or current_chunks:
-                    events_data = {
-                        "news_count": len(recent_news) if recent_news else 0,
-                        "chunks_count": len(current_chunks) if current_chunks else 0,
-                        "company": company_name
-                    }
-                    event_reasoning = await ReasoningTool.reason_on_data(
-                        json.dumps(events_data),
-                        f"Analyze recent events and developments for {company_name}. What are the key current affairs affecting the company?"
-                    )
-                    if event_reasoning:
-                        tools_used.append("ReasoningTool")
-            except Exception as e:
-                logger.warning(f"ReasoningTool failed: {e}")
+            reasoning_data = {
+                "news_analysis": news_result.data if news_result.success else {},
+                "sentiment": sentiment_result.data if sentiment_result.success else {},
+                "news_count": len(recent_news) if recent_news else 0,
+                "chunks_count": len(current_chunks)
+            }
             
-            # Process recent events
+            affairs_reasoning = await ReasoningTool.reason_on_data(
+                json.dumps(reasoning_data),
+                f"Analyze recent current affairs and developments for {company_name}. What are the key events affecting the company?"
+            )
+            if affairs_reasoning:
+                tools_used.append("ReasoningTool")
+            
+            # Process and categorize events
             events = []
             if recent_news:
-                for article in recent_news[:5]:  # Top 5 recent events
+                for article in recent_news[:10]:
                     events.append({
-                        "event": article.get('title', 'Unknown event'),
-                        "date": article.get('date', 'Unknown date'),
-                        "summary": article.get('summary', 'No summary')[:100] + "...",
+                        "title": article.get('title', 'Unknown event'),
+                        "date": article.get('date', datetime.now().strftime('%Y-%m-%d')),
+                        "summary": article.get('summary', 'No summary available')[:200] + "...",
                         "sentiment": self._analyze_news_sentiment(article.get('title', '') + article.get('summary', '')),
-                        "sources": ["yfinance"]
+                        "source": "yfinance"
                     })
             
-            # Add fallback events if no news found
-            if not events:
-                events = [
-                    {
-                        "event": f"Market analysis for {company_name}",
-                        "date": datetime.now().strftime('%Y-%m-%d'),
-                        "summary": f"Ongoing market monitoring and analysis for {company_name} in the current economic environment.",
-                        "sentiment": "neutral",
-                        "sources": ["system_generated"]
-                    }
-                ]
-            
             result_data = {
-                "events": events,
-                "total_events": len(events),
-                "sentiment_overview": sentiment_result.data.get('sentiment', 'Neutral') if sentiment_result and hasattr(sentiment_result, 'data') else 'Neutral',
                 "company_name": company_name,
                 "ticker": ticker,
+                "recent_events": events,
+                "total_events": len(events),
+                "overall_sentiment": sentiment_result.data.get('sentiment', 'Neutral') if sentiment_result.success else 'Neutral',
+                "news_analysis": news_result.data.get('analysis', '') if news_result.success else '',
+                "current_affairs_summary": affairs_reasoning.get('reasoning', '') if affairs_reasoning else '',
                 "sources": list(set(sources)),
                 "micro_agents_used": micro_agents_used,
                 "tools_used": tools_used,
                 "timestamp": datetime.now().isoformat()
             }
             
-            # Cache the result for shorter time due to time-sensitive nature
+            # Cache for shorter time due to time-sensitive nature
             cache_result(cache_key, result_data, ttl=1800)  # 30 minutes
             
             return MacroAgentResult(
@@ -1098,32 +1193,42 @@ Provide comprehensive risk assessment with mitigation strategies.""",
             return MacroAgentResult(
                 agent_name="CurrentAffairsAgent",
                 data={
-                    "events": [{
-                        "event": f"Analysis for {company_name}",
-                        "date": datetime.now().strftime('%Y-%m-%d'),
-                        "summary": f"Current affairs analysis for {company_name}",
-                        "sentiment": "neutral",
-                        "sources": ["system"]
-                    }],
-                    "total_events": 1,
-                    "sentiment_overview": "Neutral",
                     "company_name": company_name,
-                    "ticker": self._get_ticker_for_company(company_name),
-                    "sources": [],
-                    "micro_agents_used": [],
-                    "tools_used": [],
+                    "error_message": "Current affairs analysis in progress",
                     "timestamp": datetime.now().isoformat()
                 },
                 sources=[],
                 execution_time=time.time() - start_time,
-                success=True,
+                success=False,
                 micro_agents_used=[],
                 tools_used=[],
-                error=None
+                error=str(e)
             )
 
+    def _analyze_news_sentiment(self, text: str) -> str:
+        """Enhanced sentiment analysis for news text"""
+        if not text:
+            return "neutral"
+        
+        text_lower = text.lower()
+        
+        # Positive keywords
+        positive_words = ['growth', 'profit', 'gain', 'increase', 'rise', 'up', 'positive', 'strong', 'good', 'excellent', 'beat', 'outperform', 'success', 'achieve', 'milestone', 'breakthrough']
+        # Negative keywords  
+        negative_words = ['loss', 'decline', 'fall', 'down', 'negative', 'weak', 'poor', 'miss', 'underperform', 'concern', 'risk', 'challenge', 'crisis', 'problem', 'issue']
+        
+        positive_count = sum(1 for word in positive_words if word in text_lower)
+        negative_count = sum(1 for word in negative_words if word in text_lower)
+        
+        if positive_count > negative_count and positive_count > 0:
+            return "positive"
+        elif negative_count > positive_count and negative_count > 0:
+            return "negative"
+        else:
+            return "neutral"
+
     async def predict_future(self, company_name: str, years: int = 3) -> MacroAgentResult:
-        """FuturePredictionsAgent: Generate evidence-based financial projections"""
+        """Enhanced future predictions with proper micro agent integration"""
         start_time = time.time()
         cache_key = generate_cache_key("future_predictions", company_name=company_name, years=years)
         
@@ -1149,129 +1254,107 @@ Provide comprehensive risk assessment with mitigation strategies.""",
             ticker = self._get_ticker_for_company(company_name)
             
             # Use HistoricalDataAgent for trend analysis
-            try:
-                historical_result = await self.retry_micro_call(
-                    self.micro_agents.fetch_historical_data,
-                    ticker,
-                    company_name,
-                    5  # years for trend analysis
-                )
-                if historical_result and hasattr(historical_result, 'success') and historical_result.success:
-                    micro_agents_used.append("HistoricalDataAgent")
-                    sources.extend(historical_result.sources)
-            except Exception as e:
-                logger.warning(f"HistoricalDataAgent failed: {e}")
-                historical_result = None
+            historical_result = await self.retry_micro_call(
+                self.micro_agents.fetch_historical_data,
+                ticker=ticker,
+                company_name=company_name,
+                years=5
+            )
+            if historical_result.success:
+                micro_agents_used.append("HistoricalDataAgent")
+                sources.extend(historical_result.sources)
             
-            # Use ScenarioAnalysisAgent for different projections
-            try:
-                scenario_result = await self.retry_micro_call(
-                    self.micro_agents.perform_scenario_analysis,
-                    company_name,
-                    ["Optimistic", "Base Case", "Pessimistic"]
-                )
-                if scenario_result and hasattr(scenario_result, 'success') and scenario_result.success:
-                    micro_agents_used.append("ScenarioAnalysisAgent")
-                    sources.extend(scenario_result.sources)
-            except Exception as e:
-                logger.warning(f"ScenarioAnalysisAgent failed: {e}")
-                scenario_result = None
+            # Use ScenarioAnalysisAgent for projections
+            scenario_result = await self.retry_micro_call(
+                self.micro_agents.perform_scenario_analysis,
+                company_name=company_name,
+                scenarios=["Optimistic", "Base Case", "Pessimistic"]
+            )
+            if scenario_result.success:
+                micro_agents_used.append("ScenarioAnalysisAgent")
+                sources.extend(scenario_result.sources)
             
             # Use GuidanceExtractionAgent for management projections
-            try:
-                guidance_result = await self.retry_micro_call(
-                    self.micro_agents.extract_guidance,
-                    company_name
-                )
-                if guidance_result and hasattr(guidance_result, 'success') and guidance_result.success:
-                    micro_agents_used.append("GuidanceExtractionAgent")
-                    sources.extend(guidance_result.sources)
-            except Exception as e:
-                logger.warning(f"GuidanceExtractionAgent failed: {e}")
-                guidance_result = None
+            guidance_result = await self.retry_micro_call(
+                self.micro_agents.extract_guidance,
+                company_name=company_name
+            )
+            if guidance_result.success:
+                micro_agents_used.append("GuidanceExtractionAgent")
+                sources.extend(guidance_result.sources)
             
-            # Get current financial data using YFinanceNumberTool
-            try:
-                current_revenue = await YFinanceNumberTool.fetch_financial_data(
-                    ticker,
-                    "revenue"
-                )
-                if current_revenue and current_revenue.get('success'):
-                    tools_used.append("YFinanceNumberTool")
-                    sources.extend(current_revenue.get('sources', []))
-            except Exception as e:
-                logger.warning(f"YFinanceNumberTool failed: {e}")
-                current_revenue = None
+            # Use YFinanceNumberTool for current metrics
+            current_metrics = await YFinanceAgentTool.fetch_financial_data(
+                ticker,
+                "revenue profit growth"
+            )
+            if current_metrics and current_metrics.get('success'):
+                tools_used.append("YFinanceNumberTool")
+                sources.extend(current_metrics.get('sources', []))
             
-            # Generate projections with fallback assumptions
+            # Generate projections using ArithmeticCalculationTool
             projections = []
             current_year = datetime.now().year
             
-            # Get base revenue from data or use sector defaults
-            if current_revenue and current_revenue.get('data', {}).get('revenue'):
-                base_revenue = current_revenue['data']['revenue'] / 1000000  # Convert to crores
-            elif "Environmental" in company_name or "Ecosphere" in company_name:
-                base_revenue = 100  # Base assumption in crores for environmental services
-            else:
-                base_revenue = 200  # General base assumption
-            
-            # Determine growth rate from historical data or use sector defaults
-            if historical_result and hasattr(historical_result, 'data') and historical_result.data.get('growth_rate'):
-                growth_rate = historical_result.data['growth_rate'] / 100
-            elif "Environmental" in company_name or "Ecosphere" in company_name:
-                growth_rate = 0.15  # 15% growth for environmental sector
-            else:
-                growth_rate = 0.12  # 12% general growth
-            
-            ebitda_margin = 0.10 if "Environmental" in company_name else 0.08
+            # Get base metrics
+            base_revenue = current_metrics.get('data', {}).get('revenue', 1000) / 1000000 if current_metrics else 100  # in crores
+            growth_rate = historical_result.data.get('avg_growth_rate', 0.12) if historical_result.success else 0.12
             
             for i in range(1, years + 1):
                 year = current_year + i
-                projected_revenue = base_revenue * (1 + growth_rate) ** i
-                projected_ebitda = projected_revenue * ebitda_margin
+                
+                # Calculate projections using ArithmeticCalculationTool
+                calc_data = {
+                    "base_revenue": base_revenue,
+                    "growth_rate": growth_rate,
+                    "year": i
+                }
+                
+                projection_calc = ArithmeticCalculationTool.calculate_metrics(
+                    calc_data,
+                    "projected_revenue = base_revenue * ((1 + growth_rate) ** year)"
+                )
+                
+                if projection_calc:
+                    tools_used.append("ArithmeticCalculationTool")
+                    projected_revenue = projection_calc.get('projected_revenue', base_revenue * (1 + growth_rate) ** i)
+                else:
+                    projected_revenue = base_revenue * (1 + growth_rate) ** i
                 
                 projections.append({
                     "year": str(year),
                     "revenue": round(projected_revenue, 2),
-                    "ebitda": round(projected_ebitda, 2),
-                    "assumptions": f"Growth rate: {growth_rate*100:.1f}%, EBITDA margin: {ebitda_margin*100:.1f}%"
+                    "growth_rate": f"{growth_rate*100:.1f}%"
                 })
-                
-                # Use ArithmeticCalculationTool for calculation validation
-                try:
-                    calc_result = ArithmeticCalculationTool.calculate_metrics(
-                        {"revenue": projected_revenue, "margin": ebitda_margin},
-                        "EBITDA = revenue * margin"
-                    )
-                    if calc_result:
-                        tools_used.append("ArithmeticCalculationTool")
-                except Exception as e:
-                    logger.warning(f"ArithmeticCalculationTool failed: {e}")
             
             # Use ReasoningTool for projection analysis
-            try:
-                projection_data = {
-                    "projections": projections,
-                    "base_revenue": base_revenue,
-                    "growth_rate": growth_rate,
-                    "scenarios": scenario_result.data if scenario_result and hasattr(scenario_result, 'data') else {}
-                }
-                projection_reasoning = await ReasoningTool.reason_on_data(
-                    json.dumps(projection_data),
-                    f"Analyze the financial projections for {company_name}. What are the key assumptions and risk factors?"
-                )
-                if projection_reasoning:
-                    tools_used.append("ReasoningTool")
-            except Exception as e:
-                logger.warning(f"ReasoningTool failed: {e}")
+            reasoning_data = {
+                "historical": historical_result.data if historical_result.success else {},
+                "scenarios": scenario_result.data if scenario_result.success else {},
+                "guidance": guidance_result.data if guidance_result.success else {},
+                "projections": projections
+            }
+            
+            prediction_reasoning = await ReasoningTool.reason_on_data(
+                json.dumps(reasoning_data),
+                f"Analyze the financial projections for {company_name}. What are the key assumptions and potential risks to these forecasts?"
+            )
+            if prediction_reasoning:
+                tools_used.append("ReasoningTool")
             
             result_data = {
-                "projections": projections,
-                "assumptions": f"Projections for {company_name} based on sector analysis and market trends. Growth assumptions consider environmental sector dynamics and regulatory support.",
-                "confidence_level": 0.7,  # 70% confidence for sector-based projections
                 "company_name": company_name,
                 "ticker": ticker,
-                "projection_years": years,
+                "projections": projections,
+                "base_assumptions": {
+                    "growth_rate": f"{growth_rate*100:.1f}%",
+                    "base_revenue": f"{base_revenue:.2f} Cr",
+                    "projection_method": "Historical trend analysis"
+                },
+                "scenarios": scenario_result.data if scenario_result.success else {},
+                "management_guidance": guidance_result.data.get('guidance', '') if guidance_result.success else '',
+                "analysis": prediction_reasoning.get('reasoning', '') if prediction_reasoning else '',
+                "confidence_level": scenario_result.data.get('confidence', 0.7) if scenario_result.success else 0.7,
                 "sources": list(set(sources)),
                 "micro_agents_used": micro_agents_used,
                 "tools_used": tools_used,
@@ -1297,32 +1380,21 @@ Provide comprehensive risk assessment with mitigation strategies.""",
             return MacroAgentResult(
                 agent_name="FuturePredictionsAgent",
                 data={
-                    "projections": [{
-                        "year": str(datetime.now().year + 1),
-                        "revenue": 150.0,
-                        "ebitda": 15.0,
-                        "assumptions": "Base case projections"
-                    }],
-                    "assumptions": f"Base case financial projections for {company_name}",
-                    "confidence_level": 0.6,
                     "company_name": company_name,
-                    "ticker": self._get_ticker_for_company(company_name),
-                    "projection_years": years,
-                    "sources": [],
-                    "micro_agents_used": [],
-                    "tools_used": [],
+                    "projections": [{"year": str(datetime.now().year + 1), "revenue": 100.0, "growth_rate": "10.0%"}],
+                    "error_message": "Future predictions analysis in progress",
                     "timestamp": datetime.now().isoformat()
                 },
                 sources=[],
                 execution_time=time.time() - start_time,
-                success=True,
+                success=False,
                 micro_agents_used=[],
                 tools_used=[],
-                error=None
+                error=str(e)
             )
 
     async def analyze_concall(self, company_name: str) -> MacroAgentResult:
-        """ConcallAnalysisAgent: Extract insights from earnings calls and management commentary"""
+        """Enhanced concall analysis with proper micro agent integration"""
         start_time = time.time()
         cache_key = generate_cache_key("concall_analysis", company_name=company_name)
         
@@ -1345,10 +1417,19 @@ Provide comprehensive risk assessment with mitigation strategies.""",
             micro_agents_used = []
             tools_used = []
             
-            # Use GuidanceExtractionAgent for management commentary
+            # Use ConcallAnalysisAgent
+            concall_result = await self.retry_micro_call(
+                self.micro_agents.analyze_concall,
+                company_name=company_name
+            )
+            if concall_result.success:
+                micro_agents_used.append("ConcallAnalysisAgent")
+                sources.extend(concall_result.sources)
+            
+            # Use GuidanceExtractionAgent
             guidance_result = await self.retry_micro_call(
                 self.micro_agents.extract_guidance,
-                company_name
+                company_name=company_name
             )
             if guidance_result.success:
                 micro_agents_used.append("GuidanceExtractionAgent")
@@ -1357,68 +1438,68 @@ Provide comprehensive risk assessment with mitigation strategies.""",
             # Use SentimentAnalysisAgent for management tone
             sentiment_result = await self.retry_micro_call(
                 self.micro_agents.analyze_sentiment,
-                company_name,
-                "earnings call management commentary investor questions"
+                company_name=company_name,
+                text="earnings call management commentary investor questions guidance outlook"
             )
             if sentiment_result.success:
                 micro_agents_used.append("SentimentAnalysisAgent")
                 sources.extend(sentiment_result.sources)
             
-            # Search for concall transcripts using VectorSearchRAGTool
-            try:
-                concall_chunks = await VectorSearchRAGTool.search_knowledge_base(
-                    query="earnings call concall transcript management commentary investor questions",
-                    company_name=company_name,
-                    max_results=5
-                )
-                if concall_chunks:
-                    tools_used.append("VectorSearchRAGTool")
-                    for chunk in concall_chunks:
-                        sources.append(f"chunk_{chunk.get('_id', 'unknown')}")
-            except Exception as e:
-                logger.warning(f"VectorSearchRAGTool failed: {e}")
-                concall_chunks = []
+            # Use VectorSearchRAGTool for concall transcripts
+            concall_chunks = await VectorSearchTool.search_knowledge_base(
+                query=f"{company_name} earnings call concall transcript management commentary investor questions",
+                company_name=company_name,
+                filters={"category": "Earnings Call"},
+                max_results=8
+            )
+            if concall_chunks:
+                tools_used.append("VectorSearchRAGTool")
+                sources.extend([f"chunk_{chunk.get('_id', 'unknown')}" for chunk in concall_chunks])
             
-            # Use ReasoningTool for concall analysis
-            try:
-                concall_data = {
-                    "guidance": guidance_result.data if guidance_result.success else {},
-                    "sentiment": sentiment_result.data if sentiment_result.success else {},
-                    "chunks_count": len(concall_chunks) if concall_chunks else 0
-                }
-                concall_reasoning = await ReasoningTool.reason_on_data(
-                    json.dumps(concall_data),
-                    f"Analyze earnings call insights for {company_name}. What are the key management messages and investor concerns?"
+            # MongoDB fallback for concall data
+            if not concall_chunks or len(concall_chunks) < 3:
+                fallback_data = await self._query_mongodb_fallback(
+                    "earnings call concall transcript management", 
+                    company_name,
+                    "Earnings Call"
                 )
-                if concall_reasoning:
-                    tools_used.append("ReasoningTool")
-            except Exception as e:
-                logger.warning(f"ReasoningTool failed: {e}")
-                concall_reasoning = None
+                if fallback_data:
+                    concall_chunks.extend(fallback_data)
+                    sources.extend([f"mongodb_{item.get('_id', 'unknown')}" for item in fallback_data])
             
-            # Extract key points from transcripts
-            key_points = []
-            for chunk in concall_chunks[:3]:
+            # Use ReasoningTool for concall insights
+            reasoning_data = {
+                "concall_analysis": concall_result.data if concall_result.success else {},
+                "guidance": guidance_result.data if guidance_result.success else {},
+                "sentiment": sentiment_result.data if sentiment_result.success else {},
+                "transcript_chunks": len(concall_chunks)
+            }
+            
+            concall_reasoning = await ReasoningTool.reason_on_data(
+                json.dumps(reasoning_data),
+                f"Analyze the earnings call insights for {company_name}. What are the key management messages, guidance, and investor concerns?"
+            )
+            if concall_reasoning:
+                tools_used.append("ReasoningTool")
+            
+            # Extract key insights from transcripts
+            key_insights = []
+            for chunk in concall_chunks[:5]:
                 content = chunk.get('content', {})
                 if content.get('text'):
                     text = content['text']
-                    # Simple extraction of key phrases
-                    if any(keyword in text.lower() for keyword in ['outlook', 'guidance', 'strategy', 'target']):
-                        key_points.append(text[:150] + "...")
-            
-            # Add fallback key points if none found
-            if not key_points:
-                key_points = [
-                    f"Management outlook for {company_name}",
-                    "Strategic direction and guidance",
-                    "Investor Q&A highlights"
-                ]
+                    if any(keyword in text.lower() for keyword in ['outlook', 'guidance', 'strategy', 'target', 'growth', 'plan']):
+                        key_insights.append(text[:200] + "...")
             
             result_data = {
-                "guidance": guidance_result.data.get('guidance', 'No guidance available') if guidance_result.success else 'No guidance available',
-                "key_points": key_points[:5],  # Top 5 key points
+                "company_name": company_name,
+                "concall_summary": concall_result.data.get('summary', '') if concall_result.success else '',
+                "key_insights": key_insights,
+                "management_guidance": guidance_result.data.get('guidance', '') if guidance_result.success else '',
                 "management_tone": sentiment_result.data.get('sentiment', 'Neutral') if sentiment_result.success else 'Neutral',
-                "analysis": concall_reasoning.get('reasoning', 'Concall analysis in progress') if concall_reasoning else 'Concall analysis in progress',
+                "investor_concerns": concall_result.data.get('concerns', []) if concall_result.success else [],
+                "forward_outlook": guidance_result.data.get('outlook', '') if guidance_result.success else '',
+                "analysis": concall_reasoning.get('reasoning', '') if concall_reasoning else '',
                 "sources": list(set(sources)),
                 "micro_agents_used": micro_agents_used,
                 "tools_used": tools_used,
@@ -1444,25 +1525,20 @@ Provide comprehensive risk assessment with mitigation strategies.""",
             return MacroAgentResult(
                 agent_name="ConcallAnalysisAgent",
                 data={
-                    "guidance": "Management guidance analysis in progress",
-                    "key_points": ["Key points extraction in progress"],
-                    "management_tone": "Neutral",
-                    "analysis": "Concall analysis in progress",
-                    "sources": [],
-                    "micro_agents_used": [],
-                    "tools_used": [],
+                    "company_name": company_name,
+                    "error_message": "Concall analysis in progress",
                     "timestamp": datetime.now().isoformat()
                 },
                 sources=[],
                 execution_time=time.time() - start_time,
-                success=True,  # Return success with fallback data
+                success=False,
                 micro_agents_used=[],
                 tools_used=[],
-                error=None
+                error=str(e)
             )
 
     async def analyze_risks(self, company_name: str) -> MacroAgentResult:
-        """RiskAnalysisAgent: Identify and assess investment risks"""
+        """Enhanced risk analysis with proper micro agent integration"""
         start_time = time.time()
         cache_key = generate_cache_key("risk_analysis", company_name=company_name)
         
@@ -1487,10 +1563,20 @@ Provide comprehensive risk assessment with mitigation strategies.""",
             
             ticker = self._get_ticker_for_company(company_name)
             
+            # Use RiskAssessmentAgent
+            risk_result = await self.retry_micro_call(
+                self.micro_agents.assess_risks,
+                company_name=company_name
+            )
+            if risk_result.success:
+                micro_agents_used.append("RiskAssessmentAgent")
+                sources.extend(risk_result.sources)
+            
             # Use NewsAnalysisAgent for risk-related news
             news_result = await self.retry_micro_call(
                 self.micro_agents.analyze_news,
-                ticker
+                ticker=ticker,
+                company_name=company_name
             )
             if news_result.success:
                 micro_agents_used.append("NewsAnalysisAgent")
@@ -1499,96 +1585,115 @@ Provide comprehensive risk assessment with mitigation strategies.""",
             # Use SentimentAnalysisAgent for risk sentiment
             sentiment_result = await self.retry_micro_call(
                 self.micro_agents.analyze_sentiment,
-                company_name,
-                "risks challenges threats regulatory operational financial"
+                company_name=company_name,
+                text="risks challenges threats regulatory operational financial market competition"
             )
             if sentiment_result.success:
                 micro_agents_used.append("SentimentAnalysisAgent")
                 sources.extend(sentiment_result.sources)
             
-            # Get recent negative news using YFinanceNewsTool
-            try:
-                recent_news = await YFinanceNewsTool.fetch_company_news(
-                    ticker,
-                    max_results=20
-                )
-                if recent_news:
-                    tools_used.append("YFinanceNewsTool")
-                    sources.append("yfinance")
-            except Exception as e:
-                logger.warning(f"YFinanceNewsTool failed: {e}")
-                recent_news = []
-            
-            # Search for risk-related information using VectorSearchRAGTool
-            try:
-                risk_chunks = await VectorSearchRAGTool.search_knowledge_base(
-                    query=f"{company_name} risks challenges threats regulatory compliance financial",
-                    company_name=company_name,
-                    max_results=5
-                )
-                if risk_chunks:
-                    tools_used.append("VectorSearchRAGTool")
-                    for chunk in risk_chunks:
-                        sources.append(f"chunk_{chunk.get('_id', 'unknown')}")
-            except Exception as e:
-                logger.warning(f"VectorSearchRAGTool failed: {e}")
-                risk_chunks = []
-            
-            # Use ReasoningTool for risk analysis
-            try:
-                risk_data = {
-                    "news_count": len(recent_news) if recent_news else 0,
-                    "sentiment": sentiment_result.data if sentiment_result.success else {},
-                    "risk_chunks": len(risk_chunks) if risk_chunks else 0,
-                    "company": company_name
-                }
-                risk_reasoning = await ReasoningTool.reason_on_data(
-                    json.dumps(risk_data),
-                    f"Analyze investment risks for {company_name}. What are the key risk factors and mitigation strategies?"
-                )
-                if risk_reasoning:
-                    tools_used.append("ReasoningTool")
-            except Exception as e:
-                logger.warning(f"ReasoningTool failed: {e}")
-                risk_reasoning = None
-            
-            # Categorize risks from news and analysis
-            risks = []
-            
-            # Add risks from news analysis
+            # Use YFinanceNewsTool for recent risk-related news
+            recent_news = await YFinanceNewsTool.fetch_company_news(
+                ticker,
+                max_results=15
+            )
             if recent_news:
-                for article in recent_news[:10]:
+                tools_used.append("YFinanceNewsTool")
+                sources.append("yfinance_news")
+            
+            # Use VectorSearchRAGTool for risk information
+            risk_chunks = await VectorSearchTool.search_knowledge_base(
+                query=f"{company_name} risks challenges threats regulatory compliance financial operational",
+                company_name=company_name,
+                filters={"category": "Risk Analysis"},
+                max_results=8
+            )
+            if risk_chunks:
+                tools_used.append("VectorSearchRAGTool")
+                sources.extend([f"chunk_{chunk.get('_id', 'unknown')}" for chunk in risk_chunks])
+            
+            # MongoDB fallback for risk data
+            if not risk_chunks or len(risk_chunks) < 3:
+                fallback_data = await self._query_mongodb_fallback(
+                    "risks challenges threats regulatory financial", 
+                    company_name,
+                    "Risk Analysis"
+                )
+                if fallback_data:
+                    risk_chunks.extend(fallback_data)
+                    sources.extend([f"mongodb_{item.get('_id', 'unknown')}" for item in fallback_data])
+            
+            # Use ReasoningTool for comprehensive risk analysis
+            reasoning_data = {
+                "risk_assessment": risk_result.data if risk_result.success else {},
+                "news_sentiment": sentiment_result.data if sentiment_result.success else {},
+                "news_count": len(recent_news) if recent_news else 0,
+                "risk_data_sources": len(risk_chunks)
+            }
+            
+            risk_reasoning = await ReasoningTool.reason_on_data(
+                json.dumps(reasoning_data),
+                f"Analyze the comprehensive risk profile for {company_name}. What are the key risk factors, their likelihood, and potential mitigation strategies?"
+            )
+            if risk_reasoning:
+                tools_used.append("ReasoningTool")
+            
+            # Categorize and analyze risks
+            risk_categories = {
+                "Financial": [],
+                "Operational": [],
+                "Market": [],
+                "Regulatory": [],
+                "Strategic": []
+            }
+            
+            # Extract risks from news
+            if recent_news:
+                for article in recent_news:
                     title = article.get('title', '').lower()
                     summary = article.get('summary', '').lower()
                     
-                    # Simple risk categorization
-                    risk_type = "Market"
-                    if any(word in title + summary for word in ['regulation', 'government', 'policy']):
-                        risk_type = "Regulatory"
-                    elif any(word in title + summary for word in ['debt', 'loss', 'financial', 'cash']):
-                        risk_type = "Financial"
-                    elif any(word in title + summary for word in ['operations', 'production', 'supply']):
-                        risk_type = "Operational"
-                    
-                    # Only include if it seems negative
-                    if any(word in title + summary for word in ['decline', 'fall', 'loss', 'concern', 'risk', 'challenge']):
-                        risks.append({
-                            "type": risk_type,
-                            "description": article.get('title', 'Unknown risk')
-                        })
+                    # Categorize risks based on keywords
+                    if any(word in title + summary for word in ['debt', 'loss', 'profit', 'cash', 'revenue']):
+                        risk_categories["Financial"].append(article.get('title', 'Unknown risk'))
+                    elif any(word in title + summary for word in ['operation', 'production', 'supply', 'employee']):
+                        risk_categories["Operational"].append(article.get('title', 'Unknown risk'))
+                    elif any(word in title + summary for word in ['market', 'competition', 'competitor', 'share']):
+                        risk_categories["Market"].append(article.get('title', 'Unknown risk'))
+                    elif any(word in title + summary for word in ['regulation', 'law', 'compliance', 'government']):
+                        risk_categories["Regulatory"].append(article.get('title', 'Unknown risk'))
+                    else:
+                        risk_categories["Strategic"].append(article.get('title', 'Unknown risk'))
             
-            # Add generic risks if no specific risks found
-            if not risks:
-                risks = [
-                    {"type": "Market", "description": "General market volatility and economic conditions"},
-                    {"type": "Operational", "description": "Business execution and operational challenges"},
-                    {"type": "Financial", "description": "Financial leverage and liquidity management"}
-                ]
+            # Calculate risk scores using ArithmeticCalculationTool
+            risk_score_data = {
+                "financial_risks": len(risk_categories["Financial"]),
+                "operational_risks": len(risk_categories["Operational"]),
+                "market_risks": len(risk_categories["Market"]),
+                "regulatory_risks": len(risk_categories["Regulatory"]),
+                "strategic_risks": len(risk_categories["Strategic"])
+            }
+            
+            risk_score_calc = ArithmeticCalculationTool.calculate_metrics(
+                risk_score_data,
+                "overall_risk_score = (financial_risks * 0.3) + (operational_risks * 0.25) + (market_risks * 0.2) + (regulatory_risks * 0.15) + (strategic_risks * 0.1)"
+            )
+            if risk_score_calc:
+                tools_used.append("ArithmeticCalculationTool")
+                overall_risk_score = risk_score_calc.get('overall_risk_score', 0)
+            else:
+                overall_risk_score = sum(len(risks) for risks in risk_categories.values()) * 0.2
             
             result_data = {
-                "risks": risks[:10],  # Top 10 risks
-                "risk_analysis": risk_reasoning.get('reasoning', 'Risk analysis in progress') if risk_reasoning else 'Risk analysis in progress',
+                "company_name": company_name,
+                "ticker": ticker,
+                "risk_categories": risk_categories,
+                "overall_risk_score": round(overall_risk_score, 2),
+                "risk_assessment": risk_result.data.get('assessment', '') if risk_result.success else '',
+                "top_risks": risk_result.data.get('top_risks', []) if risk_result.success else [],
                 "risk_sentiment": sentiment_result.data.get('sentiment', 'Neutral') if sentiment_result.success else 'Neutral',
+                "analysis": risk_reasoning.get('reasoning', '') if risk_reasoning else '',
+                "mitigation_strategies": risk_result.data.get('mitigation', []) if risk_result.success else [],
                 "sources": list(set(sources)),
                 "micro_agents_used": micro_agents_used,
                 "tools_used": tools_used,
@@ -1614,59 +1719,51 @@ Provide comprehensive risk assessment with mitigation strategies.""",
             return MacroAgentResult(
                 agent_name="RiskAnalysisAgent",
                 data={
-                    "risks": [{"type": "Market", "description": "Risk analysis in progress"}],
-                    "risk_analysis": "Risk analysis in progress",
-                    "risk_sentiment": "Neutral",
-                    "sources": [],
-                    "micro_agents_used": [],
-                    "tools_used": [],
+                    "company_name": company_name,
+                    "error_message": "Risk analysis in progress",
                     "timestamp": datetime.now().isoformat()
                 },
                 sources=[],
                 execution_time=time.time() - start_time,
-                success=True,  # Return success with fallback data
+                success=False,
                 micro_agents_used=[],
                 tools_used=[],
-                error=None
+                error=str(e)
             )
 
-    async def orchestrate_comprehensive_analysis(self, company_name: str, sector: str = None) -> Dict[str, MacroAgentResult]:
-        """Orchestrate all macro agents for comprehensive company analysis"""
+    async def comprehensive_analysis(self, company_name: str) -> Dict[str, MacroAgentResult]:
+        """
+        Perform comprehensive analysis using all macro agents
+        Returns a dictionary with results from all analysis types
+        """
         start_time = time.time()
         logger.info(f"Starting comprehensive analysis for {company_name}")
         
-        # If sector not provided, infer from company name
-        if not sector:
-            if "Environmental" in company_name or "Ecosphere" in company_name:
-                sector = "Environmental Services"
-            else:
-                sector = "General"
-        
-        results = {}
-        
-        # Run all macro agents concurrently
-        tasks = {
-            'business': self.analyze_business(company_name),
-            'sector': self.analyze_sector(sector, company_name),
-            'deepdive': self.deep_dive_company(company_name),
-            'debt_wc': self.analyze_debt_wc(company_name),
-            'current_affairs': self.analyze_current_affairs(company_name),
-            'predictions': self.predict_future(company_name),
-            'concall': self.analyze_concall(company_name),
-            'risks': self.analyze_risks(company_name)
-        }
-        
-        # Execute all tasks concurrently
         try:
-            completed_tasks = await asyncio.gather(*tasks.values(), return_exceptions=True)
+            # Run all analyses concurrently
+            analysis_tasks = {
+                "business": self.analyze_business(company_name),
+                "sector": self.analyze_sector(company_name),
+                "deepdive": self.deep_dive_company(company_name),
+                "financials": self.analyze_financials(company_name),
+                "current_affairs": self.analyze_current_affairs(company_name),
+                "predictions": self.predict_future(company_name),
+                "concall": self.analyze_concall(company_name),
+                "risks": self.analyze_risks(company_name)
+            }
             
-            for i, (agent_name, result) in enumerate(zip(tasks.keys(), completed_tasks)):
+            # Execute all tasks concurrently
+            results = await asyncio.gather(*analysis_tasks.values(), return_exceptions=True)
+            
+            # Map results back to analysis types
+            comprehensive_results = {}
+            for i, (analysis_type, task) in enumerate(analysis_tasks.items()):
+                result = results[i]
                 if isinstance(result, Exception):
-                    logger.error(f"Agent {agent_name} failed: {result}")
-                    # Create fallback result
-                    results[agent_name] = MacroAgentResult(
-                        agent_name=agent_name,
-                        data={"error": f"Analysis failed for {agent_name}"},
+                    logger.error(f"Error in {analysis_type} analysis: {result}")
+                    comprehensive_results[analysis_type] = MacroAgentResult(
+                        agent_name=f"{analysis_type.title()}Agent",
+                        data={"error": str(result)},
                         sources=[],
                         execution_time=0.0,
                         success=False,
@@ -1675,353 +1772,171 @@ Provide comprehensive risk assessment with mitigation strategies.""",
                         error=str(result)
                     )
                 else:
-                    results[agent_name] = result
-                    
+                    comprehensive_results[analysis_type] = result
+            
+            # Log summary
+            successful_analyses = sum(1 for result in comprehensive_results.values() if result.success)
+            total_time = time.time() - start_time
+            
+            logger.info(f"Comprehensive analysis completed for {company_name}: "
+                       f"{successful_analyses}/{len(analysis_tasks)} analyses successful, "
+                       f"Total time: {total_time:.2f}s")
+            
+            return comprehensive_results
+            
         except Exception as e:
-            logger.error(f"Comprehensive analysis failed: {e}")
-            raise e
-        
-        total_time = time.time() - start_time
-        logger.info(f"Comprehensive analysis completed in {total_time:.2f} seconds")
-        
-        return results
+            logger.error(f"Error in comprehensive analysis for {company_name}: {e}")
+            # Return empty results for all analyses
+            return {
+                analysis_type: MacroAgentResult(
+                    agent_name=f"{analysis_type.title()}Agent",
+                    data={"error": "Comprehensive analysis failed"},
+                    sources=[],
+                    execution_time=0.0,
+                    success=False,
+                    micro_agents_used=[],
+                    tools_used=[],
+                    error=str(e)
+                )
+                for analysis_type in ["business", "sector", "deepdive", "financials", 
+                                    "current_affairs", "predictions", "concall", "risks"]
+            }
 
-    def generate_executive_summary(self, analysis_results: Dict[str, MacroAgentResult]) -> Dict[str, Any]:
-        """Generate executive summary from all macro agent results"""
-        summary = {
-            "company_analysis": {},
-            "key_insights": [],
-            "risk_factors": [],
-            "opportunities": [],
-            "recommendation": "HOLD",  # Default recommendation
-            "confidence_score": 0.7,
-            "data_quality": "Good",
-            "total_sources": 0,
-            "agents_used": [],
-            "tools_utilized": [],
+    def get_agent_status(self) -> Dict[str, Any]:
+        """Get status of all macro agents and their dependencies"""
+        status = {
+            "macro_agents": {
+                "total": len(self.agents),
+                "configured": list(self.agents.keys()),
+                "status": "operational" if self.agents else "not_configured"
+            },
+            "micro_agents": {
+                "status": "operational" if self.micro_agents else "not_configured",
+                "initialized": hasattr(self, 'micro_agents') and self.micro_agents is not None
+            },
+            "databases": {
+                "redis": "connected" if self.redis_client else "disconnected",
+                "mongodb": "connected" if self.mongo_client else "disconnected", 
+                "chromadb": "connected" if self.chroma_client else "disconnected"
+            },
+            "llm_config": {
+                "configured": self.llm_config is not None,
+                "model": self.llm_config.get('config_list', [{}])[0].get('model', 'unknown') if self.llm_config else 'unknown'
+            },
+            "system_health": check_system_health(),
             "timestamp": datetime.now().isoformat()
         }
         
-        # Aggregate data from all agents
-        all_sources = set()
-        all_agents = set()
-        all_tools = set()
-        
-        for agent_name, result in analysis_results.items():
-            if result.success:
-                summary["company_analysis"][agent_name] = {
-                    "status": "completed",
-                    "key_data": result.data,
-                    "execution_time": result.execution_time
-                }
-                all_sources.update(result.sources)
-                all_agents.update(result.micro_agents_used)
-                all_tools.update(result.tools_used)
-            else:
-                summary["company_analysis"][agent_name] = {
-                    "status": "failed",
-                    "error": result.error,
-                    "execution_time": result.execution_time
-                }
-        
-        # Extract key insights
-        if 'business' in analysis_results and analysis_results['business'].success:
-            business_data = analysis_results['business'].data
-            summary["key_insights"].append(f"Business Model: {business_data.get('business_model', 'Not available')[:100]}...")
-        
-        if 'predictions' in analysis_results and analysis_results['predictions'].success:
-            pred_data = analysis_results['predictions'].data
-            projections = pred_data.get('projections', [])
-            if projections:
-                summary["key_insights"].append(f"3-Year Revenue Projection: {projections[-1].get('revenue', 'N/A')} Cr")
-        
-        # Extract risk factors
-        if 'risks' in analysis_results and analysis_results['risks'].success:
-            risk_data = analysis_results['risks'].data
-            risks = risk_data.get('risks', [])
-            summary["risk_factors"] = [risk.get('description', 'Unknown risk') for risk in risks[:3]]
-        
-        # Set aggregated metrics
-        summary["total_sources"] = len(all_sources)
-        summary["agents_used"] = list(all_agents)
-        summary["tools_utilized"] = list(all_tools)
-        
-        # Calculate confidence score based on successful agents
-        successful_agents = sum(1 for result in analysis_results.values() if result.success)
-        total_agents = len(analysis_results)
-        summary["confidence_score"] = successful_agents / total_agents if total_agents > 0 else 0.0
-        
-        # Determine recommendation based on analysis
-        if summary["confidence_score"] > 0.8:
-            summary["recommendation"] = "BUY"
-        elif summary["confidence_score"] < 0.4:
-            summary["recommendation"] = "SELL"
-        else:
-            summary["recommendation"] = "HOLD"
-        
-        return summary
+        return status
 
     async def health_check(self) -> Dict[str, Any]:
-        """Check system health and component status"""
-        health_status = {
-            "system_status": "healthy",
-            "components": {},
-            "timestamp": datetime.now().isoformat()
-        }
-        
-        # Check Redis connection
-        if self.redis_client:
-            try:
-                self.redis_client.ping()
-                health_status["components"]["redis"] = "connected"
-            except Exception as e:
-                health_status["components"]["redis"] = f"error: {str(e)}"
-                health_status["system_status"] = "degraded"
-        else:
-            health_status["components"]["redis"] = "not_configured"
-        
-        # Check MongoDB connection
-        if self.mongo_client:
-            try:
-                self.mongo_client.admin.command('ping')
-                health_status["components"]["mongodb"] = "connected"
-            except Exception as e:
-                health_status["components"]["mongodb"] = f"error: {str(e)}"
-                health_status["system_status"] = "degraded"
-        else:
-            health_status["components"]["mongodb"] = "not_configured"
-        
-        # Check micro agents
+        """Perform health check on all components"""
         try:
-            health_status["components"]["micro_agents"] = "initialized"
-        except Exception as e:
-            health_status["components"]["micro_agents"] = f"error: {str(e)}"
-            health_status["system_status"] = "degraded"
-        
-        # Check LLM configuration
-        if self.llm_config:
-            health_status["components"]["llm_config"] = "configured"
-        else:
-            health_status["components"]["llm_config"] = "missing"
-            health_status["system_status"] = "degraded"
-        
-        return health_status
-
-    async def run_demo_analysis(self, company_name: str = "Ganesha Ecosphere Limited") -> Dict[str, Any]:
-        """Run a demonstration analysis for testing purposes"""
-        logger.info(f"Starting demo analysis for {company_name}")
-        
-        try:
-            # Run comprehensive analysis
-            analysis_results = await self.orchestrate_comprehensive_analysis(company_name)
-            
-            # Generate executive summary
-            executive_summary = self.generate_executive_summary(analysis_results)
-            
-            # Create demo report
-            demo_report = {
-                "company": company_name,
-                "analysis_timestamp": datetime.now().isoformat(),
-                "executive_summary": executive_summary,
-                "detailed_analysis": {
-                    agent_name: {
-                        "success": result.success,
-                        "execution_time": result.execution_time,
-                        "data_summary": {
-                            "keys": list(result.data.keys()) if result.data else [],
-                            "sources_count": len(result.sources),
-                            "micro_agents_count": len(result.micro_agents_used),
-                            "tools_count": len(result.tools_used)
-                        }
-                    }
-                    for agent_name, result in analysis_results.items()
-                },
-                "system_status": await self.health_check()
+            health_status = {
+                "overall_status": "healthy",
+                "components": {},
+                "timestamp": datetime.now().isoformat()
             }
             
-            logger.info(f"Demo analysis completed successfully for {company_name}")
-            return demo_report
-            
-        except Exception as e:
-            logger.error(f"Demo analysis failed: {e}")
-            return {
-                "company": company_name,
-                "analysis_timestamp": datetime.now().isoformat(),
-                "error": str(e),
-                "system_status": await self.health_check()
-            }
-
-    def get_supported_companies(self) -> List[str]:
-        """Get list of supported companies with known ticker mappings"""
-        return list(self._get_ticker_mappings().keys())
-    
-    def _get_ticker_mappings(self) -> Dict[str, str]:
-        """Get the complete ticker mappings dictionary"""
-        return {
-            "Ganesha Ecosphere Limited": "GANECOS.NS",
-            "Tata Motors": "TATAMOTORS.NS",
-            "Reliance Industries": "RELIANCE.NS",
-            "Infosys": "INFY.NS",
-            "HDFC Bank": "HDFCBANK.NS",
-            "ITC": "ITC.NS",
-            "Bharti Airtel": "BHARTIARTL.NS",
-            "State Bank of India": "SBIN.NS",
-            "Larsen & Toubro": "LT.NS",
-            "Asian Paints": "ASIANPAINT.NS"
-        }
-
-    async def batch_analysis(self, companies: List[str], sector: str = None) -> Dict[str, Dict[str, Any]]:
-        """Run analysis for multiple companies in batch"""
-        logger.info(f"Starting batch analysis for {len(companies)} companies")
-        
-        batch_results = {}
-        
-        # Process companies concurrently with a reasonable limit
-        semaphore = asyncio.Semaphore(3)  # Limit to 3 concurrent analyses
-        
-        async def analyze_single_company(company_name: str) -> tuple:
-            async with semaphore:
+            # Check Redis
+            if self.redis_client:
                 try:
-                    result = await self.orchestrate_comprehensive_analysis(company_name, sector)
-                    summary = self.generate_executive_summary(result)
-                    return company_name, {"success": True, "analysis": result, "summary": summary}
-                except Exception as e:
-                    logger.error(f"Batch analysis failed for {company_name}: {e}")
-                    return company_name, {"success": False, "error": str(e)}
-        
-        # Execute batch analysis
-        tasks = [analyze_single_company(company) for company in companies]
-        completed_analyses = await asyncio.gather(*tasks, return_exceptions=True)
-        
-        # Process results
-        for result in completed_analyses:
-            if isinstance(result, Exception):
-                logger.error(f"Batch analysis task failed: {result}")
-                continue
+                    self.redis_client.ping()
+                    health_status["components"]["redis"] = "healthy"
+                except:
+                    health_status["components"]["redis"] = "unhealthy"
+                    health_status["overall_status"] = "degraded"
+            else:
+                health_status["components"]["redis"] = "not_configured"
             
-            company_name, analysis_result = result
-            batch_results[company_name] = analysis_result
-        
-        logger.info(f"Batch analysis completed for {len(batch_results)} companies")
-        return batch_results
-
-    def save_analysis_report(self, analysis_results: Dict[str, MacroAgentResult], 
-                           company_name: str, format: str = "json") -> str:
-        """Save analysis report to file"""
-        timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-        filename = f"analysis_report_{company_name.replace(' ', '_')}_{timestamp}"
-        
-        # Generate executive summary
-        executive_summary = self.generate_executive_summary(analysis_results)
-        
-        # Prepare report data
-        report_data = {
-            "company_name": company_name,
-            "analysis_timestamp": datetime.now().isoformat(),
-            "executive_summary": executive_summary,
-            "detailed_analysis": {}
-        }
-        
-        # Add detailed analysis results
-        for agent_name, result in analysis_results.items():
-            report_data["detailed_analysis"][agent_name] = {
-                "agent_name": result.agent_name,
-                "success": result.success,
-                "execution_time": result.execution_time,
-                "data": result.data,
-                "sources": result.sources,
-                "micro_agents_used": result.micro_agents_used,
-                "tools_used": result.tools_used,
-                "error": result.error,
-                "cache_key": result.cache_key
+            # Check MongoDB
+            if self.mongo_client:
+                try:
+                    self.mongo_client.admin.command('ping')
+                    health_status["components"]["mongodb"] = "healthy"
+                except:
+                    health_status["components"]["mongodb"] = "unhealthy"
+                    health_status["overall_status"] = "degraded"
+            else:
+                health_status["components"]["mongodb"] = "not_configured"
+            
+            # Check ChromaDB
+            if self.chroma_client:
+                try:
+                    # Simple test to check if ChromaDB is accessible
+                    self.chroma_client.heartbeat()
+                    health_status["components"]["chromadb"] = "healthy"
+                except:
+                    health_status["components"]["chromadb"] = "unhealthy"
+                    health_status["overall_status"] = "degraded"
+            else:
+                health_status["components"]["chromadb"] = "not_configured"
+            
+            # Check micro agents
+            if self.micro_agents:
+                health_status["components"]["micro_agents"] = "healthy"
+            else:
+                health_status["components"]["micro_agents"] = "unhealthy"
+                health_status["overall_status"] = "degraded"
+            
+            # Check LLM config
+            if self.llm_config:
+                health_status["components"]["llm_config"] = "healthy"
+            else:
+                health_status["components"]["llm_config"] = "unhealthy"
+                health_status["overall_status"] = "unhealthy"
+            
+            return health_status
+            
+        except Exception as e:
+            return {
+                "overall_status": "unhealthy",
+                "error": str(e),
+                "timestamp": datetime.now().isoformat()
             }
-        
-        # Save based on format
-        if format.lower() == "json":
-            filepath = f"{filename}.json"
-            with open(filepath, 'w', encoding='utf-8') as f:
-                json.dump(report_data, f, indent=2, ensure_ascii=False, default=str)
-        else:
-            raise ValueError(f"Unsupported format: {format}")
-        
-        logger.info(f"Analysis report saved to {filepath}")
-        return filepath
 
-# Convenience function for easy usage
-async def analyze_company(company_name: str, sector: str = None) -> Dict[str, Any]:
-    """Convenience function to analyze a single company"""
-    macro_agents = AlphaSageMacroAgents()
-    
+# Factory function for creating macro agents
+def create_macro_agents() -> AlphaSageMacroAgents:
+    """Factory function to create and initialize macro agents"""
     try:
-        # Run comprehensive analysis
-        analysis_results = await macro_agents.orchestrate_comprehensive_analysis(company_name, sector)
-        
-        # Generate executive summary
-        executive_summary = macro_agents.generate_executive_summary(analysis_results)
-        
-        # Save report
-        report_file = macro_agents.save_analysis_report(analysis_results, company_name)
-        
-        return {
-            "success": True,
-            "company": company_name,
-            "executive_summary": executive_summary,
-            "detailed_results": analysis_results,
-            "report_file": report_file,
-            "timestamp": datetime.now().isoformat()
-        }
-        
+        return AlphaSageMacroAgents()
     except Exception as e:
-        logger.error(f"Company analysis failed for {company_name}: {e}")
-        return {
-            "success": False,
-            "company": company_name,
-            "error": str(e),
-            "timestamp": datetime.now().isoformat()
-        }
+        logger.error(f"Failed to create macro agents: {e}")
+        raise
 
-# Main execution for testing
+# Example usage and testing
 if __name__ == "__main__":
-    import asyncio
+    async def test_macro_agents():
+        """Test macro agents functionality"""
+        try:
+            # Create macro agents
+            macro_agents = create_macro_agents()
+            
+            # Test company name
+            test_company = "Reliance Industries"
+            
+            # Test individual analyses
+            print(f"Testing macro agents with {test_company}...")
+            
+            # Test business analysis
+            business_result = await macro_agents.analyze_business(test_company)
+            print(f"Business Analysis: {'Success' if business_result.success else 'Failed'}")
+            
+            # Test comprehensive analysis
+            print("Running comprehensive analysis...")
+            comprehensive_results = await macro_agents.comprehensive_analysis(test_company)
+            
+            # Print summary
+            for analysis_type, result in comprehensive_results.items():
+                print(f"{analysis_type.title()}: {'Success' if result.success else 'Failed'}")
+            
+            # Test health check
+            health = await macro_agents.health_check()
+            print(f"System Health: {health['overall_status']}")
+            
+        except Exception as e:
+            print(f"Test failed: {e}")
+            logger.error(f"Test failed: {e}")
     
-    async def main():
-        """Main function for testing the macro agents"""
-        print("AlphaSage Macro Agents - Financial Analysis System")
-        print("=" * 50)
-        
-        # Initialize macro agents
-        macro_agents = AlphaSageMacroAgents()
-        
-        # Check system health
-        health = await macro_agents.health_check()
-        print(f"System Status: {health['system_status']}")
-        print("Components:", health['components'])
-        print()
-        
-        # Get supported companies
-        supported_companies = macro_agents.get_supported_companies()
-        print("Supported Companies:")
-        for i, company in enumerate(supported_companies, 1):
-            print(f"{i}. {company}")
-        print()
-        
-        # Run demo analysis
-        print("Running demo analysis for Ganesha Ecosphere Limited...")
-        demo_result = await macro_agents.run_demo_analysis()
-        
-        if "error" not in demo_result:
-            print("✅ Demo analysis completed successfully!")
-            print(f"Recommendation: {demo_result['executive_summary']['recommendation']}")
-            print(f"Confidence Score: {demo_result['executive_summary']['confidence_score']:.2f}")
-            print(f"Total Sources: {demo_result['executive_summary']['total_sources']}")
-        else:
-            print("❌ Demo analysis failed:")
-            print(demo_result["error"])
-        
-        print("\nDemo completed. Check logs for detailed information.")
-    
-    # Run the main function
-    asyncio.run(main())
-
-# Export the main class and convenience function
-__all__ = ['AlphaSageMacroAgents', 'MacroAgentResult', 'analyze_company']
+    # Run the test
+    asyncio.run(test_macro_agents())

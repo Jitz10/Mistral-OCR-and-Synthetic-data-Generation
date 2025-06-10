@@ -1,0 +1,438 @@
+2025-06-10 05:27:55,861 - alphasage.gemini - INFO - Loaded 3 Gemini API keys
+2025-06-10 05:27:55,904 - pymongo.topology - DEBUG - {"message": "Starting topology monitoring", "topologyId": {"$oid": "68477503b77b097f9d8f66b4"}}
+2025-06-10 05:27:55,904 - pymongo.topology - DEBUG - {"message": "Topology description changed", "topologyId": {"$oid": "68477503b77b097f9d8f66b4"}, "previousDescription": "<TopologyDescription id: 68477503b77b097f9d8f66b4, topology_type: Unknown, servers: []>", "newDescription": "<TopologyDescription id: 68477503b77b097f9d8f66b4, topology_type: Unknown, servers: [<ServerDescription ('localhost', 27017) server_type: Unknown, rtt: None>]>"}
+2025-06-10 05:27:55,904 - pymongo.topology - DEBUG - {"message": "Starting server monitoring", "topologyId": {"$oid": "68477503b77b097f9d8f66b4"}, "serverHost": "localhost", "serverPort": 27017}
+2025-06-10 05:27:55,906 - pymongo.connection - DEBUG - {"message": "Connection pool created", "clientId": {"$oid": "68477503b77b097f9d8f66b4"}, "serverHost": "localhost", "serverPort": 27017}
+2025-06-10 05:27:55,909 - alphasage - INFO - MongoDB connection established
+2025-06-10 05:27:55,913 - pymongo.topology - DEBUG - {"message": "Server heartbeat started", "topologyId": {"$oid": "68477503b77b097f9d8f66b4"}, "driverConnectionId": 1, "serverHost": "localhost", "serverPort": 27017, "awaited": false}
+2025-06-10 05:27:55,916 - pymongo.topology - DEBUG - {"message": "Server heartbeat succeeded", "topologyId": {"$oid": "68477503b77b097f9d8f66b4"}, "driverConnectionId": 1, "serverConnectionId": 204, "serverHost": "localhost", "serverPort": 27017, "awaited": false, "durationMS": 0.0, "reply": "{\"helloOk\": true, \"ismaster\": true, \"topologyVersion\": {\"processId\": {\"$oid\": \"684749947f4860064c1c4649\"}}, \"maxBsonObjectSize\": 16777216, \"maxMessageSizeBytes\": 48000000, \"maxWriteBatchSize\": 100000, \"localTime\": {\"$date\": \"2025-06-09T23:57:55.917Z\"}, \"logicalSessionTimeoutMinutes\": 30, \"connectionId\": 204, \"maxWireVersion\": 21, \"ok\": 1.0}"}
+2025-06-10 05:27:55,916 - pymongo.connection - DEBUG - {"message": "Connection pool ready", "clientId": {"$oid": "68477503b77b097f9d8f66b4"}, "serverHost": "localhost", "serverPort": 27017}
+2025-06-10 05:27:55,925 - pymongo.topology - DEBUG - {"message": "Topology description changed", "topologyId": {"$oid": "68477503b77b097f9d8f66b4"}, "previousDescription": "<TopologyDescription id: 68477503b77b097f9d8f66b4, topology_type: Unknown, servers: [<ServerDescription ('localhost', 27017) server_type: Unknown, rtt: None>]>", "newDescription": "<TopologyDescription id: 68477503b77b097f9d8f66b4, topology_type: Single, servers: [<ServerDescription ('localhost', 27017) server_type: Standalone, rtt: 0.0>]>"}
+2025-06-10 05:27:55,926 - pymongo.topology - DEBUG - {"message": "Server heartbeat started", "topologyId": {"$oid": "68477503b77b097f9d8f66b4"}, "driverConnectionId": 1, "serverConnectionId": 204, "serverHost": "localhost", "serverPort": 27017, "awaited": true}
+2025-06-10 05:27:55,949 - alphasage - INFO - Redis connection established
+2025-06-10 05:27:56,023 - chromadb.config - DEBUG - Starting component System
+2025-06-10 05:27:56,023 - chromadb.config - DEBUG - Starting component Posthog
+2025-06-10 05:27:56,111 - alphasage - INFO - ChromaDB connection established
+2025-06-10 05:27:56,143 - asyncio - DEBUG - Using proactor: IocpProactor
+2025-06-10 05:27:56,147 - alphasage - INFO - Initializing PDFOutputAgent
+2025-06-10 05:27:56,160 - pymongo.topology - DEBUG - {"message": "Starting topology monitoring", "topologyId": {"$oid": "68477504b77b097f9d8f66b5"}}
+2025-06-10 05:27:56,160 - pymongo.topology - DEBUG - {"message": "Topology description changed", "topologyId": {"$oid": "68477504b77b097f9d8f66b5"}, "previousDescription": "<TopologyDescription id: 68477504b77b097f9d8f66b5, topology_type: Unknown, servers: []>", "newDescription": "<TopologyDescription id: 68477504b77b097f9d8f66b5, topology_type: Unknown, servers: [<ServerDescription ('localhost', 27017) server_type: Unknown, rtt: None>]>"}
+2025-06-10 05:27:56,161 - pymongo.topology - DEBUG - {"message": "Starting server monitoring", "topologyId": {"$oid": "68477504b77b097f9d8f66b5"}, "serverHost": "localhost", "serverPort": 27017}
+2025-06-10 05:27:56,163 - pymongo.connection - DEBUG - {"message": "Connection pool created", "clientId": {"$oid": "68477504b77b097f9d8f66b5"}, "serverHost": "localhost", "serverPort": 27017}
+2025-06-10 05:27:56,164 - PDFOutputAgent - INFO - MongoDB connection established
+2025-06-10 05:27:56,164 - PDFOutputAgent - INFO - Redis connection established
+2025-06-10 05:27:56,164 - pymongo.topology - DEBUG - {"message": "Server heartbeat started", "topologyId": {"$oid": "68477504b77b097f9d8f66b5"}, "driverConnectionId": 1, "serverHost": "localhost", "serverPort": 27017, "awaited": false}
+2025-06-10 05:27:56,164 - chromadb.telemetry.product.posthog - INFO - Anonymized telemetry enabled. See                     https://docs.trychroma.com/telemetry for more information.
+2025-06-10 05:27:56,164 - chromadb.config - DEBUG - Starting component System
+2025-06-10 05:27:56,165 - chromadb.config - DEBUG - Starting component Posthog
+2025-06-10 05:27:56,165 - pymongo.topology - DEBUG - {"message": "Server heartbeat succeeded", "topologyId": {"$oid": "68477504b77b097f9d8f66b5"}, "driverConnectionId": 1, "serverConnectionId": 206, "serverHost": "localhost", "serverPort": 27017, "awaited": false, "durationMS": 0.0, "reply": "{\"helloOk\": true, \"ismaster\": true, \"topologyVersion\": {\"processId\": {\"$oid\": \"684749947f4860064c1c4649\"}}, \"maxBsonObjectSize\": 16777216, \"maxMessageSizeBytes\": 48000000, \"maxWriteBatchSize\": 100000, \"localTime\": {\"$date\": \"2025-06-09T23:57:56.165Z\"}, \"logicalSessionTimeoutMinutes\": 30, \"connectionId\": 206, \"maxWireVersion\": 21, \"ok\": 1.0}"}
+2025-06-10 05:27:56,179 - pymongo.connection - DEBUG - {"message": "Connection pool ready", "clientId": {"$oid": "68477504b77b097f9d8f66b5"}, "serverHost": "localhost", "serverPort": 27017}
+2025-06-10 05:27:56,179 - pymongo.topology - DEBUG - {"message": "Topology description changed", "topologyId": {"$oid": "68477504b77b097f9d8f66b5"}, "previousDescription": "<TopologyDescription id: 68477504b77b097f9d8f66b5, topology_type: Unknown, servers: [<ServerDescription ('localhost', 27017) server_type: Unknown, rtt: None>]>", "newDescription": "<TopologyDescription id: 68477504b77b097f9d8f66b5, topology_type: Single, servers: [<ServerDescription ('localhost', 27017) server_type: Standalone, rtt: 0.0>]>"}
+2025-06-10 05:27:56,180 - pymongo.topology - DEBUG - {"message": "Server heartbeat started", "topologyId": {"$oid": "68477504b77b097f9d8f66b5"}, "driverConnectionId": 1, "serverConnectionId": 206, "serverHost": "localhost", "serverPort": 27017, "awaited": true}
+2025-06-10 05:27:56,203 - PDFOutputAgent - INFO - ChromaDB connection established
+2025-06-10 05:27:56,214 - PDFOutputAgent - INFO - Connected to existing ChromaDB collection: alphasage_chunks
+2025-06-10 05:27:56,215 - alphasage.gemini - INFO - Loaded 3 Gemini API keys
+2025-06-10 05:27:56,215 - PDFOutputAgent - INFO - All micro agents configured successfully
+2025-06-10 05:27:56,217 - pymongo.topology - DEBUG - {"message": "Starting topology monitoring", "topologyId": {"$oid": "68477504b77b097f9d8f66b6"}}
+2025-06-10 05:27:56,217 - pymongo.topology - DEBUG - {"message": "Topology description changed", "topologyId": {"$oid": "68477504b77b097f9d8f66b6"}, "previousDescription": "<TopologyDescription id: 68477504b77b097f9d8f66b6, topology_type: Unknown, servers: []>", "newDescription": "<TopologyDescription id: 68477504b77b097f9d8f66b6, topology_type: Unknown, servers: [<ServerDescription ('localhost', 27017) server_type: Unknown, rtt: None>]>"}
+2025-06-10 05:27:56,217 - pymongo.topology - DEBUG - {"message": "Starting server monitoring", "topologyId": {"$oid": "68477504b77b097f9d8f66b6"}, "serverHost": "localhost", "serverPort": 27017}
+2025-06-10 05:27:56,218 - pymongo.connection - DEBUG - {"message": "Connection pool created", "clientId": {"$oid": "68477504b77b097f9d8f66b6"}, "serverHost": "localhost", "serverPort": 27017}
+2025-06-10 05:27:56,219 - pymongo.serverSelection - DEBUG - {"message": "Server selection started", "selector": "Primary()", "operation": "ping", "topologyDescription": "<TopologyDescription id: 68477504b77b097f9d8f66b6, topology_type: Unknown, servers: [<ServerDescription ('localhost', 27017) server_type: Unknown, rtt: None>]>", "clientId": {"$oid": "68477504b77b097f9d8f66b6"}}
+2025-06-10 05:27:56,221 - pymongo.serverSelection - DEBUG - {"message": "Waiting for suitable server to become available", "selector": "Primary()", "operation": "ping", "topologyDescription": "<TopologyDescription id: 68477504b77b097f9d8f66b6, topology_type: Unknown, servers: [<ServerDescription ('localhost', 27017) server_type: Unknown, rtt: None>]>", "clientId": {"$oid": "68477504b77b097f9d8f66b6"}, "remainingTimeMS": 30000}
+2025-06-10 05:27:56,221 - pymongo.topology - DEBUG - {"message": "Server heartbeat started", "topologyId": {"$oid": "68477504b77b097f9d8f66b6"}, "driverConnectionId": 1, "serverHost": "localhost", "serverPort": 27017, "awaited": false}
+2025-06-10 05:27:56,223 - pymongo.topology - DEBUG - {"message": "Server heartbeat succeeded", "topologyId": {"$oid": "68477504b77b097f9d8f66b6"}, "driverConnectionId": 1, "serverConnectionId": 208, "serverHost": "localhost", "serverPort": 27017, "awaited": false, "durationMS": 0.0, "reply": "{\"helloOk\": true, \"ismaster\": true, \"topologyVersion\": {\"processId\": {\"$oid\": \"684749947f4860064c1c4649\"}}, \"maxBsonObjectSize\": 16777216, \"maxMessageSizeBytes\": 48000000, \"maxWriteBatchSize\": 100000, \"localTime\": {\"$date\": \"2025-06-09T23:57:56.223Z\"}, \"logicalSessionTimeoutMinutes\": 30, \"connectionId\": 208, \"maxWireVersion\": 21, \"ok\": 1.0}"}
+2025-06-10 05:27:56,223 - pymongo.connection - DEBUG - {"message": "Connection pool ready", "clientId": {"$oid": "68477504b77b097f9d8f66b6"}, "serverHost": "localhost", "serverPort": 27017}
+2025-06-10 05:27:56,224 - pymongo.topology - DEBUG - {"message": "Topology description changed", "topologyId": {"$oid": "68477504b77b097f9d8f66b6"}, "previousDescription": "<TopologyDescription id: 68477504b77b097f9d8f66b6, topology_type: Unknown, servers: [<ServerDescription ('localhost', 27017) server_type: Unknown, rtt: None>]>", "newDescription": "<TopologyDescription id: 68477504b77b097f9d8f66b6, topology_type: Single, servers: [<ServerDescription ('localhost', 27017) server_type: Standalone, rtt: 0.0>]>"}
+2025-06-10 05:27:56,224 - pymongo.serverSelection - DEBUG - {"message": "Server selection succeeded", "selector": "Primary()", "operation": "ping", "topologyDescription": "<TopologyDescription id: 68477504b77b097f9d8f66b6, topology_type: Single, servers: [<ServerDescription ('localhost', 27017) server_type: Standalone, rtt: 0.0>]>", "clientId": {"$oid": "68477504b77b097f9d8f66b6"}, "serverHost": "localhost", "serverPort": 27017}
+2025-06-10 05:27:56,225 - pymongo.topology - DEBUG - {"message": "Server heartbeat started", "topologyId": {"$oid": "68477504b77b097f9d8f66b6"}, "driverConnectionId": 1, "serverConnectionId": 208, "serverHost": "localhost", "serverPort": 27017, "awaited": true}
+2025-06-10 05:27:56,225 - pymongo.connection - DEBUG - {"message": "Connection checkout started", "clientId": {"$oid": "68477504b77b097f9d8f66b6"}, "serverHost": "localhost", "serverPort": 27017}
+2025-06-10 05:27:56,226 - pymongo.connection - DEBUG - {"message": "Connection created", "clientId": {"$oid": "68477504b77b097f9d8f66b6"}, "serverHost": "localhost", "serverPort": 27017, "driverConnectionId": 1}
+2025-06-10 05:27:56,230 - pymongo.connection - DEBUG - {"message": "Connection ready", "clientId": {"$oid": "68477504b77b097f9d8f66b6"}, "serverHost": "localhost", "serverPort": 27017, "driverConnectionId": 1, "durationMS": 0.0}
+2025-06-10 05:27:56,230 - pymongo.connection - DEBUG - {"message": "Connection checked out", "clientId": {"$oid": "68477504b77b097f9d8f66b6"}, "serverHost": "localhost", "serverPort": 27017, "driverConnectionId": 1, "durationMS": 0.0}
+2025-06-10 05:27:56,231 - pymongo.command - DEBUG - {"message": "Command started", "clientId": {"$oid": "68477504b77b097f9d8f66b6"}, "command": "{\"ping\": 1, \"lsid\": {\"id\": {\"$binary\": {\"base64\": \"bKRTtP+aQ5ufoBXe8d+L5w==\", \"subType\": \"04\"}}}, \"$db\": \"admin\"}", "commandName": "ping", "databaseName": "admin", "requestId": 28604, "operationId": 28604, "driverConnectionId": 1, "serverConnectionId": 210, "serverHost": "localhost", "serverPort": 27017}
+2025-06-10 05:27:56,232 - pymongo.command - DEBUG - {"message": "Command succeeded", "clientId": {"$oid": "68477504b77b097f9d8f66b6"}, "durationMS": 1.009, "reply": "{\"ok\": 1.0}", "commandName": "ping", "databaseName": "admin", "requestId": 28604, "operationId": 28604, "driverConnectionId": 1, "serverConnectionId": 210, "serverHost": "localhost", "serverPort": 27017}
+2025-06-10 05:27:56,232 - pymongo.connection - DEBUG - {"message": "Connection checked in", "clientId": {"$oid": "68477504b77b097f9d8f66b6"}, "serverHost": "localhost", "serverPort": 27017, "driverConnectionId": 1}
+2025-06-10 05:27:56,253 - yfinance - DEBUG - get_raw_json(): https://query2.finance.yahoo.com/v10/finance/quoteSummary/AAPL
+2025-06-10 05:27:56,253 - yfinance - DEBUG - Entering get()
+2025-06-10 05:27:56,253 - yfinance - DEBUG -  Entering _make_request()
+2025-06-10 05:27:56,254 - yfinance - DEBUG - url=https://query2.finance.yahoo.com/v10/finance/quoteSummary/AAPL
+2025-06-10 05:27:56,254 - yfinance - DEBUG - params={'modules': 'financialData,quoteType,defaultKeyStatistics,assetProfile,summaryDetail', 'corsDomain': 'finance.yahoo.com', 'formatted': 'false', 'symbol': 'AAPL'}
+2025-06-10 05:27:56,254 - yfinance - DEBUG -   Entering _get_cookie_and_crumb()
+2025-06-10 05:27:56,254 - yfinance - DEBUG - cookie_mode = 'basic'
+2025-06-10 05:27:56,254 - yfinance - DEBUG -    Entering _get_cookie_and_crumb_basic()
+2025-06-10 05:27:56,256 - yfinance - DEBUG -     Entering _get_cookie_basic()
+2025-06-10 05:27:56,256 - yfinance - DEBUG -      Entering _load_cookie_curlCffi()
+2025-06-10 05:27:56,285 - peewee - DEBUG - ('CREATE TABLE IF NOT EXISTS "_cookieschema" ("strategy" VARCHAR(255) NOT NULL PRIMARY KEY, "fetch_date" DATETIME NOT NULL, "cookie_bytes" BLOB NOT NULL) WITHOUT ROWID', [])
+2025-06-10 05:27:56,286 - peewee - DEBUG - ('SELECT "t1"."strategy", "t1"."fetch_date", "t1"."cookie_bytes" FROM "_cookieschema" AS "t1" WHERE ("t1"."strategy" = ?) LIMIT ? OFFSET ?', ['curlCffi', 1, 0])
+2025-06-10 05:27:56,287 - yfinance - DEBUG -      Exiting _load_cookie_curlCffi()
+2025-06-10 05:27:56,287 - yfinance - DEBUG - reusing persistent cookie
+2025-06-10 05:27:56,288 - yfinance - DEBUG -     Exiting _get_cookie_basic()
+2025-06-10 05:27:56,288 - yfinance - DEBUG -     Entering _get_crumb_basic()
+2025-06-10 05:27:56,289 - yfinance - DEBUG -      Entering _get_cookie_basic()
+2025-06-10 05:27:56,289 - yfinance - DEBUG - reusing cookie
+2025-06-10 05:27:56,289 - yfinance - DEBUG -      Exiting _get_cookie_basic()
+2025-06-10 05:27:57,161 - yfinance - DEBUG - crumb = '9kb8ySX7AIF'
+2025-06-10 05:27:57,161 - yfinance - DEBUG -     Exiting _get_crumb_basic()
+2025-06-10 05:27:57,161 - yfinance - DEBUG -    Exiting _get_cookie_and_crumb_basic()
+2025-06-10 05:27:57,161 - yfinance - DEBUG -   Exiting _get_cookie_and_crumb()
+2025-06-10 05:27:57,949 - yfinance - DEBUG - response code=200
+2025-06-10 05:27:57,949 - yfinance - DEBUG -  Exiting _make_request()
+2025-06-10 05:27:57,949 - yfinance - DEBUG - Exiting get()
+2025-06-10 05:27:57,951 - yfinance - DEBUG - get_raw_json(): https://query1.finance.yahoo.com/v7/finance/quote?
+2025-06-10 05:27:57,951 - yfinance - DEBUG - Entering get()
+2025-06-10 05:27:57,951 - yfinance - DEBUG -  Entering _make_request()
+2025-06-10 05:27:57,951 - yfinance - DEBUG - url=https://query1.finance.yahoo.com/v7/finance/quote?
+2025-06-10 05:27:57,952 - yfinance - DEBUG - params={'symbols': 'AAPL', 'formatted': 'false'}
+2025-06-10 05:27:57,952 - yfinance - DEBUG -   Entering _get_cookie_and_crumb()
+2025-06-10 05:27:57,952 - yfinance - DEBUG - cookie_mode = 'basic'
+2025-06-10 05:27:57,952 - yfinance - DEBUG -    Entering _get_cookie_and_crumb_basic()
+2025-06-10 05:27:57,953 - yfinance - DEBUG -     Entering _get_cookie_basic()
+2025-06-10 05:27:57,953 - yfinance - DEBUG - reusing cookie
+2025-06-10 05:27:57,953 - yfinance - DEBUG -     Exiting _get_cookie_basic()
+2025-06-10 05:27:57,953 - yfinance - DEBUG -     Entering _get_crumb_basic()
+2025-06-10 05:27:57,953 - yfinance - DEBUG - reusing crumb
+2025-06-10 05:27:57,953 - yfinance - DEBUG -     Exiting _get_crumb_basic()
+2025-06-10 05:27:57,954 - yfinance - DEBUG -    Exiting _get_cookie_and_crumb_basic()
+2025-06-10 05:27:57,954 - yfinance - DEBUG -   Exiting _get_cookie_and_crumb()
+2025-06-10 05:27:58,760 - yfinance - DEBUG - response code=200
+2025-06-10 05:27:58,761 - yfinance - DEBUG -  Exiting _make_request()
+2025-06-10 05:27:58,761 - yfinance - DEBUG - Exiting get()
+2025-06-10 05:27:58,809 - yfinance - DEBUG - Entering get()
+2025-06-10 05:27:58,809 - yfinance - DEBUG -  Entering _make_request()
+2025-06-10 05:27:58,809 - yfinance - DEBUG - url=https://query1.finance.yahoo.com/ws/fundamentals-timeseries/v1/finance/timeseries/AAPL?symbol=AAPL&type=trailingPegRatio&period1=1733702400&period2=1749513600
+2025-06-10 05:27:58,810 - yfinance - DEBUG - params=None
+2025-06-10 05:27:58,810 - yfinance - DEBUG -   Entering _get_cookie_and_crumb()
+2025-06-10 05:27:58,810 - yfinance - DEBUG - cookie_mode = 'basic'
+2025-06-10 05:27:58,810 - yfinance - DEBUG -    Entering _get_cookie_and_crumb_basic()
+2025-06-10 05:27:58,810 - yfinance - DEBUG -     Entering _get_cookie_basic()
+2025-06-10 05:27:58,810 - yfinance - DEBUG - reusing cookie
+2025-06-10 05:27:58,810 - yfinance - DEBUG -     Exiting _get_cookie_basic()
+2025-06-10 05:27:58,811 - yfinance - DEBUG -     Entering _get_crumb_basic()
+2025-06-10 05:27:58,811 - yfinance - DEBUG - reusing crumb
+2025-06-10 05:27:58,811 - yfinance - DEBUG -     Exiting _get_crumb_basic()
+2025-06-10 05:27:58,811 - yfinance - DEBUG -    Exiting _get_cookie_and_crumb_basic()
+2025-06-10 05:27:58,811 - yfinance - DEBUG -   Exiting _get_cookie_and_crumb()
+2025-06-10 05:27:59,080 - yfinance - DEBUG - response code=200
+2025-06-10 05:27:59,080 - yfinance - DEBUG -  Exiting _make_request()
+2025-06-10 05:27:59,081 - yfinance - DEBUG - Exiting get()
+2025-06-10 05:27:59,081 - alphasage - INFO - PDFOutputAgent initialized successfully
+2025-06-10 05:27:59,081 - PDFOutputAgent - INFO - Starting comprehensive report generation for Ganesha Ecosphere Limited...
+2025-06-10 05:27:59,082 - PDFOutputAgent - INFO - Starting comprehensive analysis orchestration for Ganesha Ecosphere Limited
+2025-06-10 05:27:59,082 - PDFOutputAgent - INFO - Executing macro agents analysis...
+2025-06-10 05:27:59,082 - alphasage - DEBUG - Running macro agent: business
+2025-06-10 05:27:59,083 - alphasage - DEBUG - Running macro agent: financial
+2025-06-10 05:27:59,083 - alphasage - DEBUG - Running macro agent: market
+2025-06-10 05:27:59,083 - alphasage - DEBUG - Running macro agent: risk
+2025-06-10 05:27:59,094 - alphasage - ERROR - Error executing macro agent business: 'coroutine' object has no attribute 'success'
+2025-06-10 05:27:59,095 - alphasage - ERROR - Error executing macro agent financial: 'coroutine' object has no attribute 'success'
+2025-06-10 05:27:59,095 - alphasage - ERROR - Error executing macro agent market: 'coroutine' object has no attribute 'success'
+2025-06-10 05:27:59,095 - alphasage - ERROR - Error executing macro agent risk: 'coroutine' object has no attribute 'success'
+2025-06-10 05:27:59,100 - PDFOutputAgent - INFO - Executing micro agents analysis...
+2025-06-10 05:27:59,101 - alphasage - DEBUG - Running micro agent: financial_metrics
+2025-06-10 05:27:59,101 - alphasage - DEBUG - Running micro agent: market_news
+2025-06-10 05:27:59,101 - alphasage - DEBUG - Running micro agent: business_operations
+2025-06-10 05:27:59,101 - alphasage - DEBUG - Running micro agent: risk_factors
+2025-06-10 05:27:59,102 - alphasage - ERROR - Error executing micro agent financial_metrics: 'coroutine' object has no attribute 'success'
+2025-06-10 05:27:59,102 - alphasage - ERROR - Error executing micro agent market_news: 'coroutine' object has no attribute 'success'
+2025-06-10 05:27:59,110 - alphasage - ERROR - Error executing micro agent business_operations: 'coroutine' object has no attribute 'success'
+2025-06-10 05:27:59,111 - alphasage - ERROR - Error executing micro agent risk_factors: 'coroutine' object has no attribute 'success'
+2025-06-10 05:27:59,113 - alphasage - INFO - Data quality metrics: {'quality_score': 0, 'completeness': 100.0, 'has_insights': False, 'total_metrics': 0, 'valid_metrics': 0}
+2025-06-10 05:27:59,113 - PDFOutputAgent - INFO - Generating consolidated insights...
+2025-06-10 05:27:59,113 - PDFOutputAgent - ERROR - Error generating consolidated insights: 'macro_results'
+2025-06-10 05:27:59,114 - PDFOutputAgent - ERROR - Error generating insights: 'macro_results'
+2025-06-10 05:27:59,114 - alphasage - INFO - Data quality metrics: {'quality_score': 0, 'completeness': 100.0, 'has_insights': False, 'total_metrics': 0, 'valid_metrics': 0}
+2025-06-10 05:27:59,114 - alphasage - WARNING - Low data quality score: 0%
+2025-06-10 05:27:59,115 - alphasage - WARNING - No insights generated in analysis data
+2025-06-10 05:27:59,115 - PDFOutputAgent - ERROR - Analysis data validation failed
+2025-06-10 05:27:59,115 - PDFOutputAgent - ERROR - Error in analysis orchestration: Analysis data validation failed
+2025-06-10 05:27:59,115 - PDFOutputAgent - ERROR - Error generating report: Analysis data validation failed
+2025-06-10 05:27:59,243 - pymongo.topology - DEBUG - {"message": "Server heartbeat failed", "topologyId": {"$oid": "68477504b77b097f9d8f66b5"}, "serverHost": "localhost", "serverPort": 27017, "awaited": true, "durationMS": 3063.000000000102, "failure": "\"_OperationCancelled('operation cancelled')\"", "driverConnectionId": 1}
+2025-06-10 05:27:59,509 - pymongo.topology - DEBUG - {"message": "Server heartbeat failed", "topologyId": {"$oid": "68477503b77b097f9d8f66b4"}, "serverHost": "localhost", "serverPort": 27017, "awaited": true, "durationMS": 3593.0000000007567, "failure": "\"_OperationCancelled('operation cancelled')\"", "driverConnectionId": 1}
+2025-06-10 05:30:03,499 - alphasage.gemini - INFO - Loaded 3 Gemini API keys
+2025-06-10 05:30:03,503 - pymongo.topology - DEBUG - {"message": "Starting topology monitoring", "topologyId": {"$oid": "6847758366bb94159259e236"}}
+2025-06-10 05:30:03,504 - pymongo.topology - DEBUG - {"message": "Topology description changed", "topologyId": {"$oid": "6847758366bb94159259e236"}, "previousDescription": "<TopologyDescription id: 6847758366bb94159259e236, topology_type: Unknown, servers: []>", "newDescription": "<TopologyDescription id: 6847758366bb94159259e236, topology_type: Unknown, servers: [<ServerDescription ('localhost', 27017) server_type: Unknown, rtt: None>]>"}
+2025-06-10 05:30:03,504 - pymongo.topology - DEBUG - {"message": "Starting server monitoring", "topologyId": {"$oid": "6847758366bb94159259e236"}, "serverHost": "localhost", "serverPort": 27017}
+2025-06-10 05:30:03,504 - pymongo.connection - DEBUG - {"message": "Connection pool created", "clientId": {"$oid": "6847758366bb94159259e236"}, "serverHost": "localhost", "serverPort": 27017}
+2025-06-10 05:30:03,506 - alphasage - INFO - MongoDB connection established
+2025-06-10 05:30:03,509 - pymongo.topology - DEBUG - {"message": "Server heartbeat started", "topologyId": {"$oid": "6847758366bb94159259e236"}, "driverConnectionId": 1, "serverHost": "localhost", "serverPort": 27017, "awaited": false}
+2025-06-10 05:30:03,510 - pymongo.topology - DEBUG - {"message": "Server heartbeat succeeded", "topologyId": {"$oid": "6847758366bb94159259e236"}, "driverConnectionId": 1, "serverConnectionId": 211, "serverHost": "localhost", "serverPort": 27017, "awaited": false, "durationMS": 0.0, "reply": "{\"helloOk\": true, \"ismaster\": true, \"topologyVersion\": {\"processId\": {\"$oid\": \"684749947f4860064c1c4649\"}}, \"maxBsonObjectSize\": 16777216, \"maxMessageSizeBytes\": 48000000, \"maxWriteBatchSize\": 100000, \"localTime\": {\"$date\": \"2025-06-10T00:00:03.510Z\"}, \"logicalSessionTimeoutMinutes\": 30, \"connectionId\": 211, \"maxWireVersion\": 21, \"ok\": 1.0}"}
+2025-06-10 05:30:03,510 - pymongo.connection - DEBUG - {"message": "Connection pool ready", "clientId": {"$oid": "6847758366bb94159259e236"}, "serverHost": "localhost", "serverPort": 27017}
+2025-06-10 05:30:03,510 - pymongo.topology - DEBUG - {"message": "Topology description changed", "topologyId": {"$oid": "6847758366bb94159259e236"}, "previousDescription": "<TopologyDescription id: 6847758366bb94159259e236, topology_type: Unknown, servers: [<ServerDescription ('localhost', 27017) server_type: Unknown, rtt: None>]>", "newDescription": "<TopologyDescription id: 6847758366bb94159259e236, topology_type: Single, servers: [<ServerDescription ('localhost', 27017) server_type: Standalone, rtt: 0.0>]>"}
+2025-06-10 05:30:03,511 - pymongo.topology - DEBUG - {"message": "Server heartbeat started", "topologyId": {"$oid": "6847758366bb94159259e236"}, "driverConnectionId": 1, "serverConnectionId": 211, "serverHost": "localhost", "serverPort": 27017, "awaited": true}
+2025-06-10 05:30:03,514 - alphasage - INFO - Redis connection established
+2025-06-10 05:30:03,602 - chromadb.config - DEBUG - Starting component System
+2025-06-10 05:30:03,603 - chromadb.config - DEBUG - Starting component Posthog
+2025-06-10 05:30:03,689 - alphasage - INFO - ChromaDB connection established
+2025-06-10 05:30:03,726 - asyncio - DEBUG - Using proactor: IocpProactor
+2025-06-10 05:30:03,732 - alphasage - INFO - Initializing PDFOutputAgent
+2025-06-10 05:30:03,746 - pymongo.topology - DEBUG - {"message": "Starting topology monitoring", "topologyId": {"$oid": "6847758366bb94159259e237"}}
+2025-06-10 05:30:03,746 - pymongo.topology - DEBUG - {"message": "Topology description changed", "topologyId": {"$oid": "6847758366bb94159259e237"}, "previousDescription": "<TopologyDescription id: 6847758366bb94159259e237, topology_type: Unknown, servers: []>", "newDescription": "<TopologyDescription id: 6847758366bb94159259e237, topology_type: Unknown, servers: [<ServerDescription ('localhost', 27017) server_type: Unknown, rtt: None>]>"}
+2025-06-10 05:30:03,747 - pymongo.topology - DEBUG - {"message": "Starting server monitoring", "topologyId": {"$oid": "6847758366bb94159259e237"}, "serverHost": "localhost", "serverPort": 27017}
+2025-06-10 05:30:03,748 - pymongo.connection - DEBUG - {"message": "Connection pool created", "clientId": {"$oid": "6847758366bb94159259e237"}, "serverHost": "localhost", "serverPort": 27017}
+2025-06-10 05:30:03,750 - PDFOutputAgent - INFO - MongoDB connection established
+2025-06-10 05:30:03,750 - PDFOutputAgent - INFO - Redis connection established
+2025-06-10 05:30:03,750 - pymongo.topology - DEBUG - {"message": "Server heartbeat started", "topologyId": {"$oid": "6847758366bb94159259e237"}, "driverConnectionId": 1, "serverHost": "localhost", "serverPort": 27017, "awaited": false}
+2025-06-10 05:30:03,750 - chromadb.telemetry.product.posthog - INFO - Anonymized telemetry enabled. See                     https://docs.trychroma.com/telemetry for more information.
+2025-06-10 05:30:03,752 - chromadb.config - DEBUG - Starting component System
+2025-06-10 05:30:03,752 - pymongo.topology - DEBUG - {"message": "Server heartbeat succeeded", "topologyId": {"$oid": "6847758366bb94159259e237"}, "driverConnectionId": 1, "serverConnectionId": 213, "serverHost": "localhost", "serverPort": 27017, "awaited": false, "durationMS": 0.0, "reply": "{\"helloOk\": true, \"ismaster\": true, \"topologyVersion\": {\"processId\": {\"$oid\": \"684749947f4860064c1c4649\"}}, \"maxBsonObjectSize\": 16777216, \"maxMessageSizeBytes\": 48000000, \"maxWriteBatchSize\": 100000, \"localTime\": {\"$date\": \"2025-06-10T00:00:03.752Z\"}, \"logicalSessionTimeoutMinutes\": 30, \"connectionId\": 213, \"maxWireVersion\": 21, \"ok\": 1.0}"}
+2025-06-10 05:30:03,752 - chromadb.config - DEBUG - Starting component Posthog
+2025-06-10 05:30:03,752 - pymongo.connection - DEBUG - {"message": "Connection pool ready", "clientId": {"$oid": "6847758366bb94159259e237"}, "serverHost": "localhost", "serverPort": 27017}
+2025-06-10 05:30:03,768 - pymongo.topology - DEBUG - {"message": "Topology description changed", "topologyId": {"$oid": "6847758366bb94159259e237"}, "previousDescription": "<TopologyDescription id: 6847758366bb94159259e237, topology_type: Unknown, servers: [<ServerDescription ('localhost', 27017) server_type: Unknown, rtt: None>]>", "newDescription": "<TopologyDescription id: 6847758366bb94159259e237, topology_type: Single, servers: [<ServerDescription ('localhost', 27017) server_type: Standalone, rtt: 0.0>]>"}
+2025-06-10 05:30:03,769 - pymongo.topology - DEBUG - {"message": "Server heartbeat started", "topologyId": {"$oid": "6847758366bb94159259e237"}, "driverConnectionId": 1, "serverConnectionId": 213, "serverHost": "localhost", "serverPort": 27017, "awaited": true}
+2025-06-10 05:30:03,792 - PDFOutputAgent - INFO - ChromaDB connection established
+2025-06-10 05:30:03,803 - PDFOutputAgent - INFO - Connected to existing ChromaDB collection: alphasage_chunks
+2025-06-10 05:30:03,803 - alphasage.gemini - INFO - Loaded 3 Gemini API keys
+2025-06-10 05:30:03,804 - PDFOutputAgent - INFO - All micro agents configured successfully
+2025-06-10 05:30:03,806 - pymongo.topology - DEBUG - {"message": "Starting topology monitoring", "topologyId": {"$oid": "6847758366bb94159259e238"}}
+2025-06-10 05:30:03,806 - pymongo.topology - DEBUG - {"message": "Topology description changed", "topologyId": {"$oid": "6847758366bb94159259e238"}, "previousDescription": "<TopologyDescription id: 6847758366bb94159259e238, topology_type: Unknown, servers: []>", "newDescription": "<TopologyDescription id: 6847758366bb94159259e238, topology_type: Unknown, servers: [<ServerDescription ('localhost', 27017) server_type: Unknown, rtt: None>]>"}
+2025-06-10 05:30:03,807 - pymongo.topology - DEBUG - {"message": "Starting server monitoring", "topologyId": {"$oid": "6847758366bb94159259e238"}, "serverHost": "localhost", "serverPort": 27017}
+2025-06-10 05:30:03,807 - pymongo.connection - DEBUG - {"message": "Connection pool created", "clientId": {"$oid": "6847758366bb94159259e238"}, "serverHost": "localhost", "serverPort": 27017}
+2025-06-10 05:30:03,808 - pymongo.serverSelection - DEBUG - {"message": "Server selection started", "selector": "Primary()", "operation": "ping", "topologyDescription": "<TopologyDescription id: 6847758366bb94159259e238, topology_type: Unknown, servers: [<ServerDescription ('localhost', 27017) server_type: Unknown, rtt: None>]>", "clientId": {"$oid": "6847758366bb94159259e238"}}
+2025-06-10 05:30:03,809 - pymongo.serverSelection - DEBUG - {"message": "Waiting for suitable server to become available", "selector": "Primary()", "operation": "ping", "topologyDescription": "<TopologyDescription id: 6847758366bb94159259e238, topology_type: Unknown, servers: [<ServerDescription ('localhost', 27017) server_type: Unknown, rtt: None>]>", "clientId": {"$oid": "6847758366bb94159259e238"}, "remainingTimeMS": 30000}
+2025-06-10 05:30:03,809 - pymongo.topology - DEBUG - {"message": "Server heartbeat started", "topologyId": {"$oid": "6847758366bb94159259e238"}, "driverConnectionId": 1, "serverHost": "localhost", "serverPort": 27017, "awaited": false}
+2025-06-10 05:30:03,811 - pymongo.topology - DEBUG - {"message": "Server heartbeat succeeded", "topologyId": {"$oid": "6847758366bb94159259e238"}, "driverConnectionId": 1, "serverConnectionId": 215, "serverHost": "localhost", "serverPort": 27017, "awaited": false, "durationMS": 0.0, "reply": "{\"helloOk\": true, \"ismaster\": true, \"topologyVersion\": {\"processId\": {\"$oid\": \"684749947f4860064c1c4649\"}}, \"maxBsonObjectSize\": 16777216, \"maxMessageSizeBytes\": 48000000, \"maxWriteBatchSize\": 100000, \"localTime\": {\"$date\": \"2025-06-10T00:00:03.811Z\"}, \"logicalSessionTimeoutMinutes\": 30, \"connectionId\": 215, \"maxWireVersion\": 21, \"ok\": 1.0}"}
+2025-06-10 05:30:03,811 - pymongo.connection - DEBUG - {"message": "Connection pool ready", "clientId": {"$oid": "6847758366bb94159259e238"}, "serverHost": "localhost", "serverPort": 27017}
+2025-06-10 05:30:03,811 - pymongo.topology - DEBUG - {"message": "Topology description changed", "topologyId": {"$oid": "6847758366bb94159259e238"}, "previousDescription": "<TopologyDescription id: 6847758366bb94159259e238, topology_type: Unknown, servers: [<ServerDescription ('localhost', 27017) server_type: Unknown, rtt: None>]>", "newDescription": "<TopologyDescription id: 6847758366bb94159259e238, topology_type: Single, servers: [<ServerDescription ('localhost', 27017) server_type: Standalone, rtt: 0.0>]>"}
+2025-06-10 05:30:03,812 - pymongo.serverSelection - DEBUG - {"message": "Server selection succeeded", "selector": "Primary()", "operation": "ping", "topologyDescription": "<TopologyDescription id: 6847758366bb94159259e238, topology_type: Single, servers: [<ServerDescription ('localhost', 27017) server_type: Standalone, rtt: 0.0>]>", "clientId": {"$oid": "6847758366bb94159259e238"}, "serverHost": "localhost", "serverPort": 27017}
+2025-06-10 05:30:03,814 - pymongo.topology - DEBUG - {"message": "Server heartbeat started", "topologyId": {"$oid": "6847758366bb94159259e238"}, "driverConnectionId": 1, "serverConnectionId": 215, "serverHost": "localhost", "serverPort": 27017, "awaited": true}
+2025-06-10 05:30:03,814 - pymongo.connection - DEBUG - {"message": "Connection checkout started", "clientId": {"$oid": "6847758366bb94159259e238"}, "serverHost": "localhost", "serverPort": 27017}
+2025-06-10 05:30:03,814 - pymongo.connection - DEBUG - {"message": "Connection created", "clientId": {"$oid": "6847758366bb94159259e238"}, "serverHost": "localhost", "serverPort": 27017, "driverConnectionId": 1}
+2025-06-10 05:30:03,816 - pymongo.connection - DEBUG - {"message": "Connection ready", "clientId": {"$oid": "6847758366bb94159259e238"}, "serverHost": "localhost", "serverPort": 27017, "driverConnectionId": 1, "durationMS": 0.0}
+2025-06-10 05:30:03,817 - pymongo.connection - DEBUG - {"message": "Connection checked out", "clientId": {"$oid": "6847758366bb94159259e238"}, "serverHost": "localhost", "serverPort": 27017, "driverConnectionId": 1, "durationMS": 0.0}
+2025-06-10 05:30:03,817 - pymongo.command - DEBUG - {"message": "Command started", "clientId": {"$oid": "6847758366bb94159259e238"}, "command": "{\"ping\": 1, \"lsid\": {\"id\": {\"$binary\": {\"base64\": \"FgT1pyX1ScqlLzb+fMS0mw==\", \"subType\": \"04\"}}}, \"$db\": \"admin\"}", "commandName": "ping", "databaseName": "admin", "requestId": 14361, "operationId": 14361, "driverConnectionId": 1, "serverConnectionId": 217, "serverHost": "localhost", "serverPort": 27017}
+2025-06-10 05:30:03,818 - pymongo.command - DEBUG - {"message": "Command succeeded", "clientId": {"$oid": "6847758366bb94159259e238"}, "durationMS": 1.008, "reply": "{\"ok\": 1.0}", "commandName": "ping", "databaseName": "admin", "requestId": 14361, "operationId": 14361, "driverConnectionId": 1, "serverConnectionId": 217, "serverHost": "localhost", "serverPort": 27017}
+2025-06-10 05:30:03,819 - pymongo.connection - DEBUG - {"message": "Connection checked in", "clientId": {"$oid": "6847758366bb94159259e238"}, "serverHost": "localhost", "serverPort": 27017, "driverConnectionId": 1}
+2025-06-10 05:30:03,840 - yfinance - DEBUG - get_raw_json(): https://query2.finance.yahoo.com/v10/finance/quoteSummary/AAPL
+2025-06-10 05:30:03,840 - yfinance - DEBUG - Entering get()
+2025-06-10 05:30:03,841 - yfinance - DEBUG -  Entering _make_request()
+2025-06-10 05:30:03,841 - yfinance - DEBUG - url=https://query2.finance.yahoo.com/v10/finance/quoteSummary/AAPL
+2025-06-10 05:30:03,841 - yfinance - DEBUG - params={'modules': 'financialData,quoteType,defaultKeyStatistics,assetProfile,summaryDetail', 'corsDomain': 'finance.yahoo.com', 'formatted': 'false', 'symbol': 'AAPL'}
+2025-06-10 05:30:03,842 - yfinance - DEBUG -   Entering _get_cookie_and_crumb()
+2025-06-10 05:30:03,842 - yfinance - DEBUG - cookie_mode = 'basic'
+2025-06-10 05:30:03,842 - yfinance - DEBUG -    Entering _get_cookie_and_crumb_basic()
+2025-06-10 05:30:03,843 - yfinance - DEBUG -     Entering _get_cookie_basic()
+2025-06-10 05:30:03,843 - yfinance - DEBUG -      Entering _load_cookie_curlCffi()
+2025-06-10 05:30:03,864 - peewee - DEBUG - ('CREATE TABLE IF NOT EXISTS "_cookieschema" ("strategy" VARCHAR(255) NOT NULL PRIMARY KEY, "fetch_date" DATETIME NOT NULL, "cookie_bytes" BLOB NOT NULL) WITHOUT ROWID', [])
+2025-06-10 05:30:03,865 - peewee - DEBUG - ('SELECT "t1"."strategy", "t1"."fetch_date", "t1"."cookie_bytes" FROM "_cookieschema" AS "t1" WHERE ("t1"."strategy" = ?) LIMIT ? OFFSET ?', ['curlCffi', 1, 0])
+2025-06-10 05:30:03,867 - yfinance - DEBUG -      Exiting _load_cookie_curlCffi()
+2025-06-10 05:30:03,868 - yfinance - DEBUG - reusing persistent cookie
+2025-06-10 05:30:03,868 - yfinance - DEBUG -     Exiting _get_cookie_basic()
+2025-06-10 05:30:03,868 - yfinance - DEBUG -     Entering _get_crumb_basic()
+2025-06-10 05:30:03,868 - yfinance - DEBUG -      Entering _get_cookie_basic()
+2025-06-10 05:30:03,869 - yfinance - DEBUG - reusing cookie
+2025-06-10 05:30:03,869 - yfinance - DEBUG -      Exiting _get_cookie_basic()
+2025-06-10 05:30:04,858 - yfinance - DEBUG - crumb = '9kb8ySX7AIF'
+2025-06-10 05:30:04,859 - yfinance - DEBUG -     Exiting _get_crumb_basic()
+2025-06-10 05:30:04,859 - yfinance - DEBUG -    Exiting _get_cookie_and_crumb_basic()
+2025-06-10 05:30:04,859 - yfinance - DEBUG -   Exiting _get_cookie_and_crumb()
+2025-06-10 05:30:05,606 - yfinance - DEBUG - response code=200
+2025-06-10 05:30:05,606 - yfinance - DEBUG -  Exiting _make_request()
+2025-06-10 05:30:05,606 - yfinance - DEBUG - Exiting get()
+2025-06-10 05:30:05,606 - yfinance - DEBUG - get_raw_json(): https://query1.finance.yahoo.com/v7/finance/quote?
+2025-06-10 05:30:05,608 - yfinance - DEBUG - Entering get()
+2025-06-10 05:30:05,608 - yfinance - DEBUG -  Entering _make_request()
+2025-06-10 05:30:05,609 - yfinance - DEBUG - url=https://query1.finance.yahoo.com/v7/finance/quote?
+2025-06-10 05:30:05,609 - yfinance - DEBUG - params={'symbols': 'AAPL', 'formatted': 'false'}
+2025-06-10 05:30:05,609 - yfinance - DEBUG -   Entering _get_cookie_and_crumb()
+2025-06-10 05:30:05,609 - yfinance - DEBUG - cookie_mode = 'basic'
+2025-06-10 05:30:05,609 - yfinance - DEBUG -    Entering _get_cookie_and_crumb_basic()
+2025-06-10 05:30:05,610 - yfinance - DEBUG -     Entering _get_cookie_basic()
+2025-06-10 05:30:05,610 - yfinance - DEBUG - reusing cookie
+2025-06-10 05:30:05,610 - yfinance - DEBUG -     Exiting _get_cookie_basic()
+2025-06-10 05:30:05,610 - yfinance - DEBUG -     Entering _get_crumb_basic()
+2025-06-10 05:30:05,610 - yfinance - DEBUG - reusing crumb
+2025-06-10 05:30:05,611 - yfinance - DEBUG -     Exiting _get_crumb_basic()
+2025-06-10 05:30:05,611 - yfinance - DEBUG -    Exiting _get_cookie_and_crumb_basic()
+2025-06-10 05:30:05,611 - yfinance - DEBUG -   Exiting _get_cookie_and_crumb()
+2025-06-10 05:30:05,885 - yfinance - DEBUG - response code=200
+2025-06-10 05:30:05,885 - yfinance - DEBUG -  Exiting _make_request()
+2025-06-10 05:30:05,885 - yfinance - DEBUG - Exiting get()
+2025-06-10 05:30:05,892 - yfinance - DEBUG - Entering get()
+2025-06-10 05:30:05,892 - yfinance - DEBUG -  Entering _make_request()
+2025-06-10 05:30:05,892 - yfinance - DEBUG - url=https://query1.finance.yahoo.com/ws/fundamentals-timeseries/v1/finance/timeseries/AAPL?symbol=AAPL&type=trailingPegRatio&period1=1733788800&period2=1749600000
+2025-06-10 05:30:05,892 - yfinance - DEBUG - params=None
+2025-06-10 05:30:05,893 - yfinance - DEBUG -   Entering _get_cookie_and_crumb()
+2025-06-10 05:30:05,893 - yfinance - DEBUG - cookie_mode = 'basic'
+2025-06-10 05:30:05,893 - yfinance - DEBUG -    Entering _get_cookie_and_crumb_basic()
+2025-06-10 05:30:05,893 - yfinance - DEBUG -     Entering _get_cookie_basic()
+2025-06-10 05:30:05,893 - yfinance - DEBUG - reusing cookie
+2025-06-10 05:30:05,893 - yfinance - DEBUG -     Exiting _get_cookie_basic()
+2025-06-10 05:30:05,893 - yfinance - DEBUG -     Entering _get_crumb_basic()
+2025-06-10 05:30:05,895 - yfinance - DEBUG - reusing crumb
+2025-06-10 05:30:05,895 - yfinance - DEBUG -     Exiting _get_crumb_basic()
+2025-06-10 05:30:05,895 - yfinance - DEBUG -    Exiting _get_cookie_and_crumb_basic()
+2025-06-10 05:30:05,895 - yfinance - DEBUG -   Exiting _get_cookie_and_crumb()
+2025-06-10 05:30:06,149 - yfinance - DEBUG - response code=200
+2025-06-10 05:30:06,149 - yfinance - DEBUG -  Exiting _make_request()
+2025-06-10 05:30:06,149 - yfinance - DEBUG - Exiting get()
+2025-06-10 05:30:06,151 - alphasage - INFO - PDFOutputAgent initialized successfully
+2025-06-10 05:30:06,151 - PDFOutputAgent - INFO - Starting comprehensive report generation for Ganesha Ecosphere Limited...
+2025-06-10 05:30:06,152 - alphasage - INFO - Starting comprehensive analysis orchestration for Ganesha Ecosphere Limited
+2025-06-10 05:30:06,152 - alphasage - INFO - Executing macro agents analysis...
+2025-06-10 05:30:06,152 - alphasage - DEBUG - Running macro agent: business
+2025-06-10 05:30:06,152 - alphasage - DEBUG - Running macro agent: financial
+2025-06-10 05:30:06,152 - alphasage - DEBUG - Running macro agent: market
+2025-06-10 05:30:06,152 - alphasage - DEBUG - Running macro agent: risk
+2025-06-10 05:30:06,161 - alphasage - INFO - Executing micro agents analysis...
+2025-06-10 05:30:06,195 - alphasage - DEBUG - Running micro agent: financial_metrics
+2025-06-10 05:30:06,195 - alphasage - DEBUG - Running micro agent: market_news
+2025-06-10 05:30:06,195 - alphasage - DEBUG - Running micro agent: business_operations
+2025-06-10 05:30:06,197 - alphasage - DEBUG - Running micro agent: risk_factors
+2025-06-10 05:30:06,197 - alphasage - INFO - Generating consolidated insights...
+2025-06-10 05:30:06,197 - PDFOutputAgent - ERROR - Error generating consolidated insights: 'macro_analysis'
+2025-06-10 05:30:06,197 - alphasage - ERROR - Error generating consolidated insights: 'macro_analysis'
+2025-06-10 05:30:06,197 - alphasage - ERROR - Error calculating data quality: 'coroutine' object has no attribute 'success'
+2025-06-10 05:30:06,197 - alphasage - INFO - Data quality metrics: {'quality_score': 0, 'completeness': 0, 'has_insights': False, 'total_metrics': 0, 'valid_metrics': 0}
+2025-06-10 05:30:06,197 - alphasage - ERROR - Error calculating data quality: 'coroutine' object has no attribute 'success'
+2025-06-10 05:30:06,198 - alphasage - WARNING - Low data quality score: 0%
+2025-06-10 05:30:06,198 - alphasage - WARNING - No insights generated in analysis data
+2025-06-10 05:30:06,199 - alphasage - ERROR - Error validating analysis data: 'coroutine' object has no attribute 'success'
+2025-06-10 05:30:06,199 - alphasage - ERROR - Analysis data validation failed
+2025-06-10 05:30:06,199 - alphasage - ERROR - Error in analysis orchestration: Analysis data validation failed
+2025-06-10 05:30:06,199 - PDFOutputAgent - ERROR - Error generating report: Analysis data validation failed
+2025-06-10 05:30:06,334 - pymongo.topology - DEBUG - {"message": "Server heartbeat failed", "topologyId": {"$oid": "6847758366bb94159259e237"}, "serverHost": "localhost", "serverPort": 27017, "awaited": true, "durationMS": 2563.000000000102, "failure": "\"_OperationCancelled('operation cancelled')\"", "driverConnectionId": 1}
+2025-06-10 05:30:06,584 - pymongo.topology - DEBUG - {"message": "Server heartbeat failed", "topologyId": {"$oid": "6847758366bb94159259e236"}, "serverHost": "localhost", "serverPort": 27017, "awaited": true, "durationMS": 3077.99999999952, "failure": "\"_OperationCancelled('operation cancelled')\"", "driverConnectionId": 1}
+2025-06-10 05:45:41,942 - alphasage.gemini - INFO - Loaded 3 Gemini API keys
+2025-06-10 05:45:41,948 - pymongo.topology - DEBUG - {"message": "Starting topology monitoring", "topologyId": {"$oid": "6847792d1822cc0d96138e3f"}}
+2025-06-10 05:45:41,949 - pymongo.topology - DEBUG - {"message": "Topology description changed", "topologyId": {"$oid": "6847792d1822cc0d96138e3f"}, "previousDescription": "<TopologyDescription id: 6847792d1822cc0d96138e3f, topology_type: Unknown, servers: []>", "newDescription": "<TopologyDescription id: 6847792d1822cc0d96138e3f, topology_type: Unknown, servers: [<ServerDescription ('localhost', 27017) server_type: Unknown, rtt: None>]>"}
+2025-06-10 05:45:41,950 - pymongo.topology - DEBUG - {"message": "Starting server monitoring", "topologyId": {"$oid": "6847792d1822cc0d96138e3f"}, "serverHost": "localhost", "serverPort": 27017}
+2025-06-10 05:45:41,950 - pymongo.connection - DEBUG - {"message": "Connection pool created", "clientId": {"$oid": "6847792d1822cc0d96138e3f"}, "serverHost": "localhost", "serverPort": 27017}
+2025-06-10 05:45:41,953 - alphasage - INFO - MongoDB connection established
+2025-06-10 05:45:41,958 - pymongo.topology - DEBUG - {"message": "Server heartbeat started", "topologyId": {"$oid": "6847792d1822cc0d96138e3f"}, "driverConnectionId": 1, "serverHost": "localhost", "serverPort": 27017, "awaited": false}
+2025-06-10 05:45:41,961 - pymongo.topology - DEBUG - {"message": "Server heartbeat succeeded", "topologyId": {"$oid": "6847792d1822cc0d96138e3f"}, "driverConnectionId": 1, "serverConnectionId": 218, "serverHost": "localhost", "serverPort": 27017, "awaited": false, "durationMS": 14.999999999417923, "reply": "{\"helloOk\": true, \"ismaster\": true, \"topologyVersion\": {\"processId\": {\"$oid\": \"684749947f4860064c1c4649\"}}, \"maxBsonObjectSize\": 16777216, \"maxMessageSizeBytes\": 48000000, \"maxWriteBatchSize\": 100000, \"localTime\": {\"$date\": \"2025-06-10T00:15:41.961Z\"}, \"logicalSessionTimeoutMinutes\": 30, \"connectionId\": 218, \"maxWireVersion\": 21, \"ok\": 1.0}"}
+2025-06-10 05:45:41,962 - pymongo.connection - DEBUG - {"message": "Connection pool ready", "clientId": {"$oid": "6847792d1822cc0d96138e3f"}, "serverHost": "localhost", "serverPort": 27017}
+2025-06-10 05:45:41,963 - pymongo.topology - DEBUG - {"message": "Topology description changed", "topologyId": {"$oid": "6847792d1822cc0d96138e3f"}, "previousDescription": "<TopologyDescription id: 6847792d1822cc0d96138e3f, topology_type: Unknown, servers: [<ServerDescription ('localhost', 27017) server_type: Unknown, rtt: None>]>", "newDescription": "<TopologyDescription id: 6847792d1822cc0d96138e3f, topology_type: Single, servers: [<ServerDescription ('localhost', 27017) server_type: Standalone, rtt: 0.014999999999417923>]>"}
+2025-06-10 05:45:41,965 - pymongo.topology - DEBUG - {"message": "Server heartbeat started", "topologyId": {"$oid": "6847792d1822cc0d96138e3f"}, "driverConnectionId": 1, "serverConnectionId": 218, "serverHost": "localhost", "serverPort": 27017, "awaited": true}
+2025-06-10 05:45:41,997 - alphasage - INFO - Redis connection established
+2025-06-10 05:45:42,086 - chromadb.config - DEBUG - Starting component System
+2025-06-10 05:45:42,087 - chromadb.config - DEBUG - Starting component Posthog
+2025-06-10 05:45:42,192 - alphasage - INFO - ChromaDB connection established
+2025-06-10 05:45:42,227 - asyncio - DEBUG - Using proactor: IocpProactor
+2025-06-10 05:45:42,231 - alphasage - INFO - Initializing PDFOutputAgent
+2025-06-10 05:45:42,241 - pymongo.topology - DEBUG - {"message": "Starting topology monitoring", "topologyId": {"$oid": "6847792e1822cc0d96138e40"}}
+2025-06-10 05:45:42,242 - pymongo.topology - DEBUG - {"message": "Topology description changed", "topologyId": {"$oid": "6847792e1822cc0d96138e40"}, "previousDescription": "<TopologyDescription id: 6847792e1822cc0d96138e40, topology_type: Unknown, servers: []>", "newDescription": "<TopologyDescription id: 6847792e1822cc0d96138e40, topology_type: Unknown, servers: [<ServerDescription ('localhost', 27017) server_type: Unknown, rtt: None>]>"}
+2025-06-10 05:45:42,242 - pymongo.topology - DEBUG - {"message": "Starting server monitoring", "topologyId": {"$oid": "6847792e1822cc0d96138e40"}, "serverHost": "localhost", "serverPort": 27017}
+2025-06-10 05:45:42,243 - pymongo.connection - DEBUG - {"message": "Connection pool created", "clientId": {"$oid": "6847792e1822cc0d96138e40"}, "serverHost": "localhost", "serverPort": 27017}
+2025-06-10 05:45:42,244 - PDFOutputAgent - INFO - MongoDB connection established
+2025-06-10 05:45:42,245 - PDFOutputAgent - INFO - Redis connection established
+2025-06-10 05:45:42,245 - pymongo.topology - DEBUG - {"message": "Server heartbeat started", "topologyId": {"$oid": "6847792e1822cc0d96138e40"}, "driverConnectionId": 1, "serverHost": "localhost", "serverPort": 27017, "awaited": false}
+2025-06-10 05:45:42,245 - chromadb.telemetry.product.posthog - INFO - Anonymized telemetry enabled. See                     https://docs.trychroma.com/telemetry for more information.
+2025-06-10 05:45:42,246 - chromadb.config - DEBUG - Starting component System
+2025-06-10 05:45:42,246 - chromadb.config - DEBUG - Starting component Posthog
+2025-06-10 05:45:42,246 - pymongo.topology - DEBUG - {"message": "Server heartbeat succeeded", "topologyId": {"$oid": "6847792e1822cc0d96138e40"}, "driverConnectionId": 1, "serverConnectionId": 220, "serverHost": "localhost", "serverPort": 27017, "awaited": false, "durationMS": 0.0, "reply": "{\"helloOk\": true, \"ismaster\": true, \"topologyVersion\": {\"processId\": {\"$oid\": \"684749947f4860064c1c4649\"}}, \"maxBsonObjectSize\": 16777216, \"maxMessageSizeBytes\": 48000000, \"maxWriteBatchSize\": 100000, \"localTime\": {\"$date\": \"2025-06-10T00:15:42.246Z\"}, \"logicalSessionTimeoutMinutes\": 30, \"connectionId\": 220, \"maxWireVersion\": 21, \"ok\": 1.0}"}
+2025-06-10 05:45:42,264 - pymongo.connection - DEBUG - {"message": "Connection pool ready", "clientId": {"$oid": "6847792e1822cc0d96138e40"}, "serverHost": "localhost", "serverPort": 27017}
+2025-06-10 05:45:42,264 - pymongo.topology - DEBUG - {"message": "Topology description changed", "topologyId": {"$oid": "6847792e1822cc0d96138e40"}, "previousDescription": "<TopologyDescription id: 6847792e1822cc0d96138e40, topology_type: Unknown, servers: [<ServerDescription ('localhost', 27017) server_type: Unknown, rtt: None>]>", "newDescription": "<TopologyDescription id: 6847792e1822cc0d96138e40, topology_type: Single, servers: [<ServerDescription ('localhost', 27017) server_type: Standalone, rtt: 0.0>]>"}
+2025-06-10 05:45:42,265 - pymongo.topology - DEBUG - {"message": "Server heartbeat started", "topologyId": {"$oid": "6847792e1822cc0d96138e40"}, "driverConnectionId": 1, "serverConnectionId": 220, "serverHost": "localhost", "serverPort": 27017, "awaited": true}
+2025-06-10 05:45:42,290 - PDFOutputAgent - INFO - ChromaDB connection established
+2025-06-10 05:45:42,303 - PDFOutputAgent - INFO - Connected to existing ChromaDB collection: alphasage_chunks
+2025-06-10 05:45:42,304 - alphasage.gemini - INFO - Loaded 3 Gemini API keys
+2025-06-10 05:45:42,304 - PDFOutputAgent - INFO - All micro agents configured successfully
+2025-06-10 05:45:42,306 - pymongo.topology - DEBUG - {"message": "Starting topology monitoring", "topologyId": {"$oid": "6847792e1822cc0d96138e41"}}
+2025-06-10 05:45:42,307 - pymongo.topology - DEBUG - {"message": "Topology description changed", "topologyId": {"$oid": "6847792e1822cc0d96138e41"}, "previousDescription": "<TopologyDescription id: 6847792e1822cc0d96138e41, topology_type: Unknown, servers: []>", "newDescription": "<TopologyDescription id: 6847792e1822cc0d96138e41, topology_type: Unknown, servers: [<ServerDescription ('localhost', 27017) server_type: Unknown, rtt: None>]>"}
+2025-06-10 05:45:42,308 - pymongo.topology - DEBUG - {"message": "Starting server monitoring", "topologyId": {"$oid": "6847792e1822cc0d96138e41"}, "serverHost": "localhost", "serverPort": 27017}
+2025-06-10 05:45:42,309 - pymongo.connection - DEBUG - {"message": "Connection pool created", "clientId": {"$oid": "6847792e1822cc0d96138e41"}, "serverHost": "localhost", "serverPort": 27017}
+2025-06-10 05:45:42,311 - pymongo.serverSelection - DEBUG - {"message": "Server selection started", "selector": "Primary()", "operation": "ping", "topologyDescription": "<TopologyDescription id: 6847792e1822cc0d96138e41, topology_type: Unknown, servers: [<ServerDescription ('localhost', 27017) server_type: Unknown, rtt: None>]>", "clientId": {"$oid": "6847792e1822cc0d96138e41"}}
+2025-06-10 05:45:42,312 - pymongo.topology - DEBUG - {"message": "Server heartbeat started", "topologyId": {"$oid": "6847792e1822cc0d96138e41"}, "driverConnectionId": 1, "serverHost": "localhost", "serverPort": 27017, "awaited": false}
+2025-06-10 05:45:42,312 - pymongo.serverSelection - DEBUG - {"message": "Waiting for suitable server to become available", "selector": "Primary()", "operation": "ping", "topologyDescription": "<TopologyDescription id: 6847792e1822cc0d96138e41, topology_type: Unknown, servers: [<ServerDescription ('localhost', 27017) server_type: Unknown, rtt: None>]>", "clientId": {"$oid": "6847792e1822cc0d96138e41"}, "remainingTimeMS": 30000}
+2025-06-10 05:45:42,313 - pymongo.topology - DEBUG - {"message": "Server heartbeat succeeded", "topologyId": {"$oid": "6847792e1822cc0d96138e41"}, "driverConnectionId": 1, "serverConnectionId": 222, "serverHost": "localhost", "serverPort": 27017, "awaited": false, "durationMS": 0.0, "reply": "{\"helloOk\": true, \"ismaster\": true, \"topologyVersion\": {\"processId\": {\"$oid\": \"684749947f4860064c1c4649\"}}, \"maxBsonObjectSize\": 16777216, \"maxMessageSizeBytes\": 48000000, \"maxWriteBatchSize\": 100000, \"localTime\": {\"$date\": \"2025-06-10T00:15:42.313Z\"}, \"logicalSessionTimeoutMinutes\": 30, \"connectionId\": 222, \"maxWireVersion\": 21, \"ok\": 1.0}"}
+2025-06-10 05:45:42,315 - pymongo.connection - DEBUG - {"message": "Connection pool ready", "clientId": {"$oid": "6847792e1822cc0d96138e41"}, "serverHost": "localhost", "serverPort": 27017}
+2025-06-10 05:45:42,315 - pymongo.topology - DEBUG - {"message": "Topology description changed", "topologyId": {"$oid": "6847792e1822cc0d96138e41"}, "previousDescription": "<TopologyDescription id: 6847792e1822cc0d96138e41, topology_type: Unknown, servers: [<ServerDescription ('localhost', 27017) server_type: Unknown, rtt: None>]>", "newDescription": "<TopologyDescription id: 6847792e1822cc0d96138e41, topology_type: Single, servers: [<ServerDescription ('localhost', 27017) server_type: Standalone, rtt: 0.0>]>"}
+2025-06-10 05:45:42,316 - pymongo.serverSelection - DEBUG - {"message": "Server selection succeeded", "selector": "Primary()", "operation": "ping", "topologyDescription": "<TopologyDescription id: 6847792e1822cc0d96138e41, topology_type: Single, servers: [<ServerDescription ('localhost', 27017) server_type: Standalone, rtt: 0.0>]>", "clientId": {"$oid": "6847792e1822cc0d96138e41"}, "serverHost": "localhost", "serverPort": 27017}
+2025-06-10 05:45:42,317 - pymongo.topology - DEBUG - {"message": "Server heartbeat started", "topologyId": {"$oid": "6847792e1822cc0d96138e41"}, "driverConnectionId": 1, "serverConnectionId": 222, "serverHost": "localhost", "serverPort": 27017, "awaited": true}
+2025-06-10 05:45:42,317 - pymongo.connection - DEBUG - {"message": "Connection checkout started", "clientId": {"$oid": "6847792e1822cc0d96138e41"}, "serverHost": "localhost", "serverPort": 27017}
+2025-06-10 05:45:42,318 - pymongo.connection - DEBUG - {"message": "Connection created", "clientId": {"$oid": "6847792e1822cc0d96138e41"}, "serverHost": "localhost", "serverPort": 27017, "driverConnectionId": 1}
+2025-06-10 05:45:42,345 - pymongo.connection - DEBUG - {"message": "Connection ready", "clientId": {"$oid": "6847792e1822cc0d96138e41"}, "serverHost": "localhost", "serverPort": 27017, "driverConnectionId": 1, "durationMS": 0.0}
+2025-06-10 05:45:42,346 - pymongo.connection - DEBUG - {"message": "Connection checked out", "clientId": {"$oid": "6847792e1822cc0d96138e41"}, "serverHost": "localhost", "serverPort": 27017, "driverConnectionId": 1, "durationMS": 0.031000000000858563}
+2025-06-10 05:45:42,347 - pymongo.command - DEBUG - {"message": "Command started", "clientId": {"$oid": "6847792e1822cc0d96138e41"}, "command": "{\"ping\": 1, \"lsid\": {\"id\": {\"$binary\": {\"base64\": \"uLjcGM07Q2ioeLvQ/FuUcg==\", \"subType\": \"04\"}}}, \"$db\": \"admin\"}", "commandName": "ping", "databaseName": "admin", "requestId": 21089, "operationId": 21089, "driverConnectionId": 1, "serverConnectionId": 224, "serverHost": "localhost", "serverPort": 27017}
+2025-06-10 05:45:42,349 - pymongo.command - DEBUG - {"message": "Command succeeded", "clientId": {"$oid": "6847792e1822cc0d96138e41"}, "durationMS": 2.0010000000000003, "reply": "{\"ok\": 1.0}", "commandName": "ping", "databaseName": "admin", "requestId": 21089, "operationId": 21089, "driverConnectionId": 1, "serverConnectionId": 224, "serverHost": "localhost", "serverPort": 27017}
+2025-06-10 05:45:42,349 - pymongo.connection - DEBUG - {"message": "Connection checked in", "clientId": {"$oid": "6847792e1822cc0d96138e41"}, "serverHost": "localhost", "serverPort": 27017, "driverConnectionId": 1}
+2025-06-10 05:45:42,374 - yfinance - DEBUG - get_raw_json(): https://query2.finance.yahoo.com/v10/finance/quoteSummary/AAPL
+2025-06-10 05:45:42,374 - yfinance - DEBUG - Entering get()
+2025-06-10 05:45:42,375 - yfinance - DEBUG -  Entering _make_request()
+2025-06-10 05:45:42,375 - yfinance - DEBUG - url=https://query2.finance.yahoo.com/v10/finance/quoteSummary/AAPL
+2025-06-10 05:45:42,375 - yfinance - DEBUG - params={'modules': 'financialData,quoteType,defaultKeyStatistics,assetProfile,summaryDetail', 'corsDomain': 'finance.yahoo.com', 'formatted': 'false', 'symbol': 'AAPL'}
+2025-06-10 05:45:42,376 - yfinance - DEBUG -   Entering _get_cookie_and_crumb()
+2025-06-10 05:45:42,376 - yfinance - DEBUG - cookie_mode = 'basic'
+2025-06-10 05:45:42,376 - yfinance - DEBUG -    Entering _get_cookie_and_crumb_basic()
+2025-06-10 05:45:42,377 - yfinance - DEBUG -     Entering _get_cookie_basic()
+2025-06-10 05:45:42,377 - yfinance - DEBUG -      Entering _load_cookie_curlCffi()
+2025-06-10 05:45:42,388 - peewee - DEBUG - ('CREATE TABLE IF NOT EXISTS "_cookieschema" ("strategy" VARCHAR(255) NOT NULL PRIMARY KEY, "fetch_date" DATETIME NOT NULL, "cookie_bytes" BLOB NOT NULL) WITHOUT ROWID', [])
+2025-06-10 05:45:42,389 - peewee - DEBUG - ('SELECT "t1"."strategy", "t1"."fetch_date", "t1"."cookie_bytes" FROM "_cookieschema" AS "t1" WHERE ("t1"."strategy" = ?) LIMIT ? OFFSET ?', ['curlCffi', 1, 0])
+2025-06-10 05:45:42,390 - yfinance - DEBUG -      Exiting _load_cookie_curlCffi()
+2025-06-10 05:45:42,390 - yfinance - DEBUG - reusing persistent cookie
+2025-06-10 05:45:42,390 - yfinance - DEBUG -     Exiting _get_cookie_basic()
+2025-06-10 05:45:42,390 - yfinance - DEBUG -     Entering _get_crumb_basic()
+2025-06-10 05:45:42,391 - yfinance - DEBUG -      Entering _get_cookie_basic()
+2025-06-10 05:45:42,391 - yfinance - DEBUG - reusing cookie
+2025-06-10 05:45:42,392 - yfinance - DEBUG -      Exiting _get_cookie_basic()
+2025-06-10 05:45:42,849 - yfinance - DEBUG - crumb = '9kb8ySX7AIF'
+2025-06-10 05:45:42,849 - yfinance - DEBUG -     Exiting _get_crumb_basic()
+2025-06-10 05:45:42,849 - yfinance - DEBUG -    Exiting _get_cookie_and_crumb_basic()
+2025-06-10 05:45:42,851 - yfinance - DEBUG -   Exiting _get_cookie_and_crumb()
+2025-06-10 05:45:43,156 - yfinance - DEBUG - response code=200
+2025-06-10 05:45:43,157 - yfinance - DEBUG -  Exiting _make_request()
+2025-06-10 05:45:43,157 - yfinance - DEBUG - Exiting get()
+2025-06-10 05:45:43,158 - yfinance - DEBUG - get_raw_json(): https://query1.finance.yahoo.com/v7/finance/quote?
+2025-06-10 05:45:43,158 - yfinance - DEBUG - Entering get()
+2025-06-10 05:45:43,158 - yfinance - DEBUG -  Entering _make_request()
+2025-06-10 05:45:43,158 - yfinance - DEBUG - url=https://query1.finance.yahoo.com/v7/finance/quote?
+2025-06-10 05:45:43,158 - yfinance - DEBUG - params={'symbols': 'AAPL', 'formatted': 'false'}
+2025-06-10 05:45:43,158 - yfinance - DEBUG -   Entering _get_cookie_and_crumb()
+2025-06-10 05:45:43,159 - yfinance - DEBUG - cookie_mode = 'basic'
+2025-06-10 05:45:43,159 - yfinance - DEBUG -    Entering _get_cookie_and_crumb_basic()
+2025-06-10 05:45:43,159 - yfinance - DEBUG -     Entering _get_cookie_basic()
+2025-06-10 05:45:43,159 - yfinance - DEBUG - reusing cookie
+2025-06-10 05:45:43,159 - yfinance - DEBUG -     Exiting _get_cookie_basic()
+2025-06-10 05:45:43,159 - yfinance - DEBUG -     Entering _get_crumb_basic()
+2025-06-10 05:45:43,159 - yfinance - DEBUG - reusing crumb
+2025-06-10 05:45:43,161 - yfinance - DEBUG -     Exiting _get_crumb_basic()
+2025-06-10 05:45:43,161 - yfinance - DEBUG -    Exiting _get_cookie_and_crumb_basic()
+2025-06-10 05:45:43,161 - yfinance - DEBUG -   Exiting _get_cookie_and_crumb()
+2025-06-10 05:45:43,264 - yfinance - DEBUG - response code=200
+2025-06-10 05:45:43,264 - yfinance - DEBUG -  Exiting _make_request()
+2025-06-10 05:45:43,264 - yfinance - DEBUG - Exiting get()
+2025-06-10 05:45:43,273 - yfinance - DEBUG - Entering get()
+2025-06-10 05:45:43,273 - yfinance - DEBUG -  Entering _make_request()
+2025-06-10 05:45:43,273 - yfinance - DEBUG - url=https://query1.finance.yahoo.com/ws/fundamentals-timeseries/v1/finance/timeseries/AAPL?symbol=AAPL&type=trailingPegRatio&period1=1733788800&period2=1749600000
+2025-06-10 05:45:43,273 - yfinance - DEBUG - params=None
+2025-06-10 05:45:43,273 - yfinance - DEBUG -   Entering _get_cookie_and_crumb()
+2025-06-10 05:45:43,273 - yfinance - DEBUG - cookie_mode = 'basic'
+2025-06-10 05:45:43,275 - yfinance - DEBUG -    Entering _get_cookie_and_crumb_basic()
+2025-06-10 05:45:43,275 - yfinance - DEBUG -     Entering _get_cookie_basic()
+2025-06-10 05:45:43,275 - yfinance - DEBUG - reusing cookie
+2025-06-10 05:45:43,275 - yfinance - DEBUG -     Exiting _get_cookie_basic()
+2025-06-10 05:45:43,275 - yfinance - DEBUG -     Entering _get_crumb_basic()
+2025-06-10 05:45:43,275 - yfinance - DEBUG - reusing crumb
+2025-06-10 05:45:43,276 - yfinance - DEBUG -     Exiting _get_crumb_basic()
+2025-06-10 05:45:43,276 - yfinance - DEBUG -    Exiting _get_cookie_and_crumb_basic()
+2025-06-10 05:45:43,276 - yfinance - DEBUG -   Exiting _get_cookie_and_crumb()
+2025-06-10 05:45:43,382 - yfinance - DEBUG - response code=200
+2025-06-10 05:45:43,382 - yfinance - DEBUG -  Exiting _make_request()
+2025-06-10 05:45:43,382 - yfinance - DEBUG - Exiting get()
+2025-06-10 05:45:43,383 - alphasage - INFO - PDFOutputAgent initialized successfully
+2025-06-10 05:45:43,383 - PDFOutputAgent - INFO - Starting comprehensive report generation for Ganesha Ecosphere Limited...
+2025-06-10 05:45:43,383 - alphasage - INFO - Starting comprehensive analysis orchestration for Ganesha Ecosphere Limited
+2025-06-10 05:45:43,384 - alphasage - INFO - Executing macro agents analysis...
+2025-06-10 05:45:43,384 - alphasage - DEBUG - Running macro agent: business
+2025-06-10 05:45:43,384 - alphasage - DEBUG - Running macro agent: financial
+2025-06-10 05:45:43,384 - alphasage - DEBUG - Running macro agent: market
+2025-06-10 05:45:43,385 - alphasage - DEBUG - Running macro agent: risk
+2025-06-10 05:45:43,386 - alphasage - INFO - Executing micro agents analysis...
+2025-06-10 05:45:43,386 - alphasage - DEBUG - Running micro agent: financial_metrics
+2025-06-10 05:45:43,386 - alphasage - DEBUG - Running micro agent: market_news
+2025-06-10 05:45:43,386 - alphasage - DEBUG - Running micro agent: business_operations
+2025-06-10 05:45:43,386 - alphasage - DEBUG - Running micro agent: risk_factors
+2025-06-10 05:45:43,387 - alphasage - INFO - Generating consolidated insights...
+2025-06-10 05:45:43,387 - PDFOutputAgent - ERROR - Error generating consolidated insights: 'macro_analysis'
+2025-06-10 05:45:43,387 - alphasage - ERROR - Error generating consolidated insights: 'macro_analysis'
+2025-06-10 05:45:43,387 - alphasage - ERROR - Error calculating data quality: 'coroutine' object has no attribute 'success'
+2025-06-10 05:45:43,387 - alphasage - INFO - Data quality metrics: {'quality_score': 0, 'completeness': 0, 'has_insights': False, 'total_metrics': 0, 'valid_metrics': 0}
+2025-06-10 05:45:43,388 - alphasage - ERROR - Error calculating data quality: 'coroutine' object has no attribute 'success'
+2025-06-10 05:45:43,388 - alphasage - WARNING - Low data quality score: 0%
+2025-06-10 05:45:43,388 - alphasage - WARNING - No insights generated in analysis data
+2025-06-10 05:45:43,389 - alphasage - ERROR - Error validating analysis data: 'coroutine' object has no attribute 'success'
+2025-06-10 05:45:43,389 - alphasage - ERROR - Analysis data validation failed
+2025-06-10 05:45:43,389 - alphasage - ERROR - Error in analysis orchestration: Analysis data validation failed
+2025-06-10 05:45:43,389 - PDFOutputAgent - ERROR - Error generating report: Analysis data validation failed
+2025-06-10 05:45:43,792 - pymongo.topology - DEBUG - {"message": "Server heartbeat failed", "topologyId": {"$oid": "6847792e1822cc0d96138e40"}, "serverHost": "localhost", "serverPort": 27017, "awaited": true, "durationMS": 1531.9999999992433, "failure": "\"_OperationCancelled('operation cancelled')\"", "driverConnectionId": 1}
+2025-06-10 05:45:43,997 - pymongo.topology - DEBUG - {"message": "Server heartbeat failed", "topologyId": {"$oid": "6847792d1822cc0d96138e3f"}, "serverHost": "localhost", "serverPort": 27017, "awaited": true, "durationMS": 2031.9999999992433, "failure": "\"_OperationCancelled('operation cancelled')\"", "driverConnectionId": 1}
