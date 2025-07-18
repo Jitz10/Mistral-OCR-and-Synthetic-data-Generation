@@ -17,7 +17,7 @@ try:
     from autogen.coding import LocalCommandLineCodeExecutor
 except ImportError as e:
     print("ERROR: Missing autogen library. Please install it with:")
-    print("pip install pyautogen")
+    print("pip install ag2")
     raise e
 
 # Database and caching imports
